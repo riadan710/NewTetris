@@ -16,6 +16,8 @@ void gotoxy(int x, int y); //커서 이동 함수
 // 메뉴 관련 함수
 void DesignMainMenu(); // 메인 메뉴 디자인
 int MainMenu(); // 메인 메뉴
+void MenuTwo(); // 조작법 메뉴
+void MenuThree(); // 제작자 메뉴
 
 
 int main() {
@@ -34,12 +36,10 @@ int main() {
 			Sleep(300);
 			break;
 		case 3:
-			printf("조작법");
-			Sleep(300);
+			MenuTwo();
 			break;
 		case 6:
-			printf("제작자");
-			Sleep(300);
+			MenuThree();
 			break;
 		default:
 			exit(1);
@@ -138,6 +138,140 @@ int MainMenu()
 			else
 				if (key == 13) //엔터키를 눌렀을 때
 					return return_n; //화살표의 좌표값을 반환
+		}
+	}
+}
+
+void MenuTwo() // 조작법 메뉴
+{
+	system("cls");
+	DesignMainMenu();
+	gotoxy(Width / 2 - 3, Height / 2 - 9);
+	printf("조작키");
+	gotoxy(Width / 2 - 10, Height / 2 - 5);
+	printf("←, → : Move Left, Right");
+	gotoxy(Width / 2 - 6, Height / 2 - 3);
+	printf("↓ : Soft Drop");
+	gotoxy(Width / 2 - 9, Height / 2 - 1);
+	printf("Space : Hard Drop");
+	gotoxy(Width / 2 - 6, Height / 2 + 1);
+	printf("↑ : Rotate");
+	gotoxy(Width / 2 - 9, Height / 2 + 3);
+	printf("Shift : Hold");
+
+	gotoxy(Width / 2 - 8, Height / 2 + 7);
+	printf("종료하시겠습니까?");
+	gotoxy(Width / 2 - 6, Height / 2 + 9);
+	printf("예");
+	gotoxy(Width / 2 + 1, Height / 2 + 9);
+	printf("아니오");
+	gotoxy(Width / 2 - 3, Height / 2 + 9);
+	printf("◀");
+
+	int return_n = 0;
+	while (1) //키보드 움직임
+	{
+		int key;
+		if (kbhit())
+		{
+			key = getch();
+			if (key == 224 || key == 0)
+			{
+				key = getch();
+				switch (key)
+				{
+				case 75: //좌 기본
+					gotoxy(Width / 2 - 3 + return_n, Height / 2 + 9);
+					printf("  ");
+					return_n = 0;
+					gotoxy(Width / 2 - 3, Height / 2 + 9);
+					printf("◀");
+					break;
+				case 77: //우 11칸앞
+					return_n = 11;
+					gotoxy(Width / 2 + 8 - return_n, Height / 2 + 9);
+					printf("  ");
+					gotoxy(Width / 2 + 8, Height / 2 + 9);
+					printf("◀");
+					break;
+				default:
+					break;
+				}
+			}
+			else
+				if (key == 13)//엔터
+				{
+					if (return_n == 0)
+						exit(1);
+					else
+						break;
+				}
+
+		}
+	}
+}
+
+void MenuThree() // 제작자 메뉴
+{
+	system("cls");
+	DesignMainMenu();
+	gotoxy(Width / 2 - 2, Height / 2 - 7);
+	printf("제작");
+	gotoxy(Width / 2 - 15, Height / 2 - 3);
+	printf("중앙대학교 소프트웨어학부 21학번");
+	gotoxy(Width / 2 - 7, Height / 2 );
+	printf("김재오, 김여진");
+	gotoxy(Width / 2 - 7, Height / 2 + 2);
+	printf("이우진, 전수빈");
+
+	gotoxy(Width / 2 - 8, Height / 2 + 7);
+	printf("종료하시겠습니까?");
+	gotoxy(Width / 2 - 6, Height / 2 + 9);
+	printf("예");
+	gotoxy(Width / 2 + 1, Height / 2 + 9);
+	printf("아니오");
+	gotoxy(Width / 2 - 3, Height / 2 + 9);
+	printf("◀");
+
+	int return_n = 0;
+	while (1) //키보드 움직임
+	{
+		int key;
+		if (kbhit())
+		{
+			key = getch();
+			if (key == 224 || key == 0)
+			{
+				key = getch();
+				switch (key)
+				{
+				case 75: //좌 기본
+					gotoxy(Width / 2 - 3 + return_n, Height / 2 + 9);
+					printf("  ");
+					return_n = 0;
+					gotoxy(Width / 2 - 3, Height / 2 + 9);
+					printf("◀");
+					break;
+				case 77: //우 11칸앞
+					return_n = 11;
+					gotoxy(Width / 2 + 8 - return_n, Height / 2 + 9);
+					printf("  ");
+					gotoxy(Width / 2 + 8, Height / 2 + 9);
+					printf("◀");
+					break;
+				default:
+					break;
+				}
+			}
+			else
+				if (key == 13)//엔터
+				{
+					if (return_n == 0)
+						exit(1);
+					else
+						break;
+				}
+
 		}
 	}
 }
