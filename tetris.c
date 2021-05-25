@@ -20,7 +20,7 @@ int key;
 #define kbhit _kbhit
 #define getch _getch
 
-int block[7][4][4][4] = {
+int block[7][4][4][4] = {  // [7]은 블럭갯수. 랜덤으로 변환, 2차원 [4]는 증감할때마다 회전
 	{ // T모양 블럭
 		{
 			{0,0,0,0},
@@ -233,20 +233,20 @@ int MainMenu(); // 메인 메뉴
 void MenuTwo(); // 조작법 메뉴
 void MenuThree(); // 제작자 메뉴
 void MenuOne(); // 게임시작 메뉴
-void DrawMap();
-void DrawBlock();
-void DropBlock();
-void BlockToGround();
-void RemoveLine();
+void DrawMap(); // 맵의 형태와 쌓인 블럭 그림
+void DrawBlock(); // 현재 블럭 그리기 (4차원배열)
+void DropBlock(); // 0.8초마다 블럭을 한칸씩 밑으로 내림
+void BlockToGround(); // 1초동안 땅에 닿아있을때 동작이 없으면 땅으로 변함, 랜덤한 블럭을 만들고 위로 올림
+void RemoveLine(); // 블럭제거 후 한칸씩 땡김
 void InputKey();
-void CreateRandomForm();
-bool CheckCrash(int x, int y);
+void CreateRandomForm(); // 블럭이 내려올때마다 랜덤으로 바뀜. 0~6
+bool CheckCrash(int x, int y); // 충돌감지 겹치는게 있으면 true를 반환
 
 int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -512,7 +512,7 @@ void MenuOne() // 게임시작 메뉴
 	}
 }
 
-void CreateRandomForm() {
+void CreateRandomForm() { // 블럭이 내려올때마다 랜덤으로 바뀜. 0~6
 	blockForm = rand() % 7;
 }
 
@@ -521,21 +521,55 @@ void DrawMap()
 	gotoxy(0, 0);
 	for (int i = 0; i < 16; i++) {
 		for (int j = 0; j < 12; j++) {
-			if (space[i][j] == 1) {
+			switch (space[i][j]) {
+			case 1:
 				gotoxy(j * 2, i);
 				printf("□");
-			}
-			else if (space[i][j] == 2) {
+				break;
+			case 2:
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
 				gotoxy(j * 2, i);
 				printf("■");
+				break;
+			case 3:
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
+				gotoxy(j * 2, i);
+				printf("■");
+				break;
+			case 4:
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+				gotoxy(j * 2, i);
+				printf("■");
+				break;
+			case 5:
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11);
+				gotoxy(j * 2, i);
+				printf("■");
+				break;
+			case 6:
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
+				gotoxy(j * 2, i);
+				printf("■");
+				break;
+			case 7:
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);
+				gotoxy(j * 2, i);
+				printf("■");
+				break;
+			case 8:
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+				gotoxy(j * 2, i);
+				printf("■");
+				break;
 			}
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 		}
 	}
 }
 
 void DrawBlock()
 {
-	/*switch (blockForm) {
+	switch (blockForm) {
 	case 0:
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
 		break;
@@ -557,7 +591,7 @@ void DrawBlock()
 	case 6:
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 		break;
-	}*/
+	}
 
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -567,10 +601,10 @@ void DrawBlock()
 			}
 		}
 	}
-	//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 }
 
-void DropBlock()
+void DropBlock() // 0.8초마다 블럭을 한칸씩 밑으로 내림
 {
 	endT = clock();
 	if ((float)(endT - startDropT) >= 800) {
@@ -582,14 +616,36 @@ void DropBlock()
 	}
 }
 
-void BlockToGround() {
+void BlockToGround() { // 1초동안 땅에 닿아있을때 동작이 없으면 땅으로 변함, 랜덤한 블럭을 만들고 위로 올림
 	if (CheckCrash(x, y + 1) == true) {
 		if ((float)(endT - startGroundT) > 1000) {
 			// 현재 블록 저장
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
 					if (block[blockForm][blockRotation][i][j] == 1) {
-						space[i + y][j + x / 2] = 2;
+						switch (blockForm) {
+						case 0:
+							space[i + y][j + x / 2] = 2;
+							break;
+						case 1:
+							space[i + y][j + x / 2] = 3;
+							break;
+						case 2:
+							space[i + y][j + x / 2] = 4;
+							break;
+						case 3:
+							space[i + y][j + x / 2] = 5;
+							break;
+						case 4:
+							space[i + y][j + x / 2] = 6;
+							break;
+						case 5:
+							space[i + y][j + x / 2] = 7;
+							break;
+						case 6:
+							space[i + y][j + x / 2] = 8;
+							break;
+						}
 					}
 				}
 			}
@@ -604,7 +660,7 @@ void RemoveLine() {
 	for (int i = 15; i >= 0; i--) { // 벽라인 제외한 값
 		int cnt = 0;
 		for (int j = 1; j < 11; j++) { // 
-			if (space[i][j] == 2) {
+			if (space[i][j] == 2 || space[i][j] == 3 || space[i][j] == 4 || space[i][j] == 5 || space[i][j] == 6 || space[i][j] == 7 || space[i][j] == 8) {
 				cnt++;
 			}
 		}
@@ -625,7 +681,7 @@ void InputKey() {
 	if (_kbhit()) {
 		key = _getch();
 		switch (key) {
-		case 32: // space
+		case 72: // up
 			blockRotation++;
 			if (blockRotation >= 4) blockRotation = 0;
 			startGroundT = clock();
@@ -651,12 +707,12 @@ void InputKey() {
 	}
 }
 
-bool CheckCrash(int x, int y) {
+bool CheckCrash(int x, int y) { // 충돌감지 겹치는게 있으면 true를 반환
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			if (block[blockForm][blockRotation][i][j] == 1) {
 				int t = space[i + y][j + x / 2];
-				if (t == 1 || t == 2) { // 벽일 때, 블럭일 때
+				if (t == 1 || t == 2 || t == 3 || t == 4 || t == 5 || t == 6 || t == 7 || t == 8) { // 벽일 때, 블럭일 때
 					return true;
 				}
 			}
