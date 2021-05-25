@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <Windows.h>
 #include <mmsystem.h>
+#include <stdbool.h>
 
 #pragma comment(lib, "winmm.lib") //사운드
 
@@ -10,6 +11,30 @@
 #define kbhit _kbhit
 #define getch _getch
 //↑ 언더바 문제 해결을 위함
+#define BLACK SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),0);
+#define NAVY SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),1);
+#define GREEN SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),2);
+#define BLUEGREEN SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),3);
+#define ORANGE SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),4);
+#define VIOLET SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),5);
+#define GOLD SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),6);
+#define ORIGINAL SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),7);
+#define GRAY SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),8);
+#define BLUE SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),9);
+#define YELLOWGREEN SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
+#define SKYBLUE SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),11);
+#define RED SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12);
+#define PINK SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),13);
+#define YELLOW SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),14);
+#define WHITE SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
+
+// 변수 세팅
+int Score = 0, Level = 1, Ren = 0, Goal = 10;
+int KeyboardRepeatDelay = 50, KeyboardRepeatRate = 50;
+int MusicVolume = 50, ChunkVolume = 50;
+int garbage, sumofsent = 0;
+bool BtB = false;
+bool TSpin = false;
 
 // 기본 세팅 함수
 void Console_Size(); // 콘솔 사이즈 설정
