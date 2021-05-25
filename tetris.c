@@ -1,58 +1,252 @@
 #include <stdio.h>
-#include <Windows.h>
-#include <mmsystem.h>
+#include <windows.h>
+#include <conio.h>
+#include <time.h> 
 #include <stdbool.h>
+#include <mmsystem.h>
 
 #pragma comment(lib, "winmm.lib") //사운드
 
-// 기본 설정 상수
-#define Width 120  // 창 가로 크기
-#define Height 40  // 창 세로 크기
+clock_t startDropT, endT, startGroundT;
+
+int x = 8, y = 0;
+RECT blockSize;
+int blockForm;
+int blockRotation = 0;
+int key;
+
+#define Width 90  // 창 가로 크기
+#define Height 30  // 창 세로 크기
 #define kbhit _kbhit
 #define getch _getch
-//↑ 언더바 문제 해결을 위함
-#define BLACK SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),0);
-#define NAVY SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),1);
-#define GREEN SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),2);
-#define BLUEGREEN SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),3);
-#define ORANGE SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),4);
-#define VIOLET SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),5);
-#define GOLD SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),6);
-#define ORIGINAL SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),7);
-#define GRAY SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),8);
-#define BLUE SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),9);
-#define YELLOWGREEN SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),10);
-#define SKYBLUE SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),11);
-#define RED SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12);
-#define PINK SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),13);
-#define YELLOW SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),14);
-#define WHITE SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),15);
 
-// 변수 세팅
-int Score = 0, Level = 1, Ren = 0, Goal = 10;
-int KeyboardRepeatDelay = 50, KeyboardRepeatRate = 50;
-int MusicVolume = 50, ChunkVolume = 50;
-int garbage, sumofsent = 0;
-bool BtB = false;
-bool TSpin = false;
+int block[7][4][4][4] = {
+	{ // T모양 블럭
+		{
+			{0,0,0,0},
+			{0,1,0,0},
+			{1,1,1,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,1,0,0},
+			{0,1,1,0},
+			{0,1,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,0,0,0},
+			{1,1,1,0},
+			{0,1,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,1,0,0},
+			{1,1,0,0},
+			{0,1,0,0}
+		}
+	},
+	{    // 번개 블럭
+		{
+			{0,0,0,0},
+			{0,1,1,0},
+			{1,1,0,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{1,0,0,0},
+			{1,1,0,0},
+			{0,1,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,1,1,0},
+			{1,1,0,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{1,0,0,0},
+			{1,1,0,0},
+			{0,1,0,0}
+		}
+	},
+	{   // 번개 블럭 반대
+		{
+			{0,0,0,0},
+			{1,1,0,0},
+			{0,1,1,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,1,0,0},
+			{1,1,0,0},
+			{1,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{1,1,0,0},
+			{0,1,1,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,1,0,0},
+			{1,1,0,0},
+			{1,0,0,0}
+		}
+	},
+	{   // 1자형 블럭
+		{
+			{0,1,0,0},
+			{0,1,0,0},
+			{0,1,0,0},
+			{0,1,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,0,0,0},
+			{1,1,1,1},
+			{0,0,0,0}
+		},
+		{
+			{0,1,0,0},
+			{0,1,0,0},
+			{0,1,0,0},
+			{0,1,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,0,0,0},
+			{1,1,1,1},
+			{0,0,0,0}
+		}
+	},
+	{   // L자형 블럭
+		{
+			{0,0,0,0},
+			{1,0,0,0},
+			{1,1,1,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{1,1,0,0},
+			{1,0,0,0},
+			{1,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{1,1,1,0},
+			{0,0,1,0},
+			{0,0,0,0}
+		},
+		{
+			{0,1,0,0},
+			{0,1,0,0},
+			{1,1,0,0},
+			{0,0,0,0}
+		}
+	},
+	{   // L자형 블럭 반대
+		{
+			{0,0,0,0},
+			{0,0,1,0},
+			{1,1,1,0},
+			{0,0,0,0}
+		},
+		{
+			{1,0,0,0},
+			{1,0,0,0},
+			{1,1,0,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{1,1,1,0},
+			{1,0,0,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{1,1,0,0},
+			{0,1,0,0},
+			{0,1,0,0}
+		}
+	},
+	{   // 네모 블럭
+		{
+			{0,0,0,0},
+			{0,1,1,0},
+			{0,1,1,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,1,1,0},
+			{0,1,1,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,1,1,0},
+			{0,1,1,0},
+			{0,0,0,0}
+		},
+		{
+			{0,0,0,0},
+			{0,1,1,0},
+			{0,1,1,0},
+			{0,0,0,0}
+		}
+	}
+};
 
-// 기본 세팅 함수
+int space[15 + 1][10 + 2] = {  // 세로 15+1(아래벽)칸, 가로 10+2(양쪽 벽)칸  
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,0,0,1},
+	{1,1,1,1,1,1,1,1,1,1,1,1}
+};
+
 void Console_Size(); // 콘솔 사이즈 설정
 void CursorView(char show); // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 void gotoxy(int x, int y); //커서 이동 함수
 
-// 메뉴 관련 함수
 void DesignMainMenu(); // 메인 메뉴 디자인
 int MainMenu(); // 메인 메뉴
 void MenuTwo(); // 조작법 메뉴
 void MenuThree(); // 제작자 메뉴
-
+void MenuOne(); // 게임시작 메뉴
+void DrawMap();
+void DrawBlock();
+void DropBlock();
+void BlockToGround();
+void RemoveLine();
+void InputKey();
+void CreateRandomForm();
+bool CheckCrash(int x, int y);
 
 int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -61,8 +255,7 @@ int main() {
 		switch (return_n)
 		{
 		case 0:
-			printf("게임시작");
-			Sleep(300);
+			MenuOne();
 			break;
 		case 3:
 			MenuTwo();
@@ -83,7 +276,6 @@ void gotoxy(int x, int y) //커서 이동 함수
 	COORD pos = { x,y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
-
 
 void Console_Size() // 콘솔 사이즈 설정
 {
@@ -107,12 +299,12 @@ void CursorView(char show)  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 
 void DesignMainMenu() // 메인 메뉴 디자인
 {
-	printf("\n\n\n\n");
-	printf("			■■■■■   ■■■   ■■■■■   ■■■■      ■■■■■     ■■■■  \n");
-	printf("			    ■       ■           ■       ■      ■        ■        ■         \n");
-	printf("			    ■       ■■■       ■       ■■■■          ■         ■■■■  \n");
-	printf("			    ■       ■           ■       ■     ■         ■                ■  \n");
-	printf("			    ■       ■■■       ■       ■      ■    ■■■■■     ■■■■  \n");
+	printf("\n\n");
+	printf("         ■■■■■   ■■■   ■■■■■   ■■■■      ■■■■■     ■■■■  \n");
+	printf("             ■       ■           ■       ■      ■        ■        ■         \n");
+	printf("             ■       ■■■       ■       ■■■■          ■         ■■■■  \n");
+	printf("             ■       ■           ■       ■     ■         ■                ■  \n");
+	printf("             ■       ■■■       ■       ■      ■    ■■■■■     ■■■■  \n");
 	printf("\n\n\n");
 }
 
@@ -120,7 +312,7 @@ int MainMenu()
 {
 	system("cls");
 	DesignMainMenu();
-	
+
 	gotoxy(Width / 2 - 4, Height / 2);
 	printf("게임 시작");
 	gotoxy(Width / 2 - 4, Height / 2 + 3);
@@ -175,17 +367,17 @@ void MenuTwo() // 조작법 메뉴
 {
 	system("cls");
 	DesignMainMenu();
-	gotoxy(Width / 2 - 3, Height / 2 - 9);
+	gotoxy(Width / 2 - 3, Height / 2 - 6);
 	printf("조작키");
-	gotoxy(Width / 2 - 10, Height / 2 - 5);
+	gotoxy(Width / 2 - 10, Height / 2 - 4);
 	printf("←, → : Move Left, Right");
-	gotoxy(Width / 2 - 6, Height / 2 - 3);
+	gotoxy(Width / 2 - 6, Height / 2 - 2);
 	printf("↓ : Soft Drop");
-	gotoxy(Width / 2 - 9, Height / 2 - 1);
+	gotoxy(Width / 2 - 9, Height / 2);
 	printf("Space : Hard Drop");
-	gotoxy(Width / 2 - 6, Height / 2 + 1);
+	gotoxy(Width / 2 - 6, Height / 2 + 2);
 	printf("↑ : Rotate");
-	gotoxy(Width / 2 - 9, Height / 2 + 3);
+	gotoxy(Width / 2 - 9, Height / 2 + 4);
 	printf("Shift : Hold");
 
 	gotoxy(Width / 2 - 8, Height / 2 + 7);
@@ -235,7 +427,6 @@ void MenuTwo() // 조작법 메뉴
 					else
 						break;
 				}
-
 		}
 	}
 }
@@ -244,11 +435,11 @@ void MenuThree() // 제작자 메뉴
 {
 	system("cls");
 	DesignMainMenu();
-	gotoxy(Width / 2 - 2, Height / 2 - 7);
+	gotoxy(Width / 2 - 2, Height / 2 - 6);
 	printf("제작");
 	gotoxy(Width / 2 - 15, Height / 2 - 3);
 	printf("중앙대학교 소프트웨어학부 21학번");
-	gotoxy(Width / 2 - 7, Height / 2 );
+	gotoxy(Width / 2 - 7, Height / 2);
 	printf("김재오, 김여진");
 	gotoxy(Width / 2 - 7, Height / 2 + 2);
 	printf("이우진, 전수빈");
@@ -302,4 +493,174 @@ void MenuThree() // 제작자 메뉴
 				}
 		}
 	}
+}
+
+void MenuOne() // 게임시작 메뉴
+{
+	system("cls");
+	startDropT = clock();
+	CreateRandomForm();
+
+	while (1)
+	{
+		DrawMap();
+		DrawBlock();
+		DropBlock();
+		BlockToGround();
+		RemoveLine();
+		InputKey();
+	}
+}
+
+void CreateRandomForm() {
+	blockForm = rand() % 7;
+}
+
+void DrawMap()
+{
+	gotoxy(0, 0);
+	for (int i = 0; i < 16; i++) {
+		for (int j = 0; j < 12; j++) {
+			if (space[i][j] == 1) {
+				gotoxy(j * 2, i);
+				printf("□");
+			}
+			else if (space[i][j] == 2) {
+				gotoxy(j * 2, i);
+				printf("■");
+			}
+		}
+	}
+}
+
+void DrawBlock()
+{
+	/*switch (blockForm) {
+	case 0:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
+		break;
+	case 1:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
+		break;
+	case 2:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+		break;
+	case 3:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11);
+		break;
+	case 4:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
+		break;
+	case 5:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);
+		break;
+	case 6:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+		break;
+	}*/
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (block[blockForm][blockRotation][i][j] == 1) {
+				gotoxy(x + j * 2, y + i);
+				printf("■");
+			}
+		}
+	}
+	//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+}
+
+void DropBlock()
+{
+	endT = clock();
+	if ((float)(endT - startDropT) >= 800) {
+		if (CheckCrash(x, y + 1) == true) return;
+		y++;
+		startDropT = clock();
+		startGroundT = clock();
+		system("cls");
+	}
+}
+
+void BlockToGround() {
+	if (CheckCrash(x, y + 1) == true) {
+		if ((float)(endT - startGroundT) > 1000) {
+			// 현재 블록 저장
+			for (int i = 0; i < 4; i++) {
+				for (int j = 0; j < 4; j++) {
+					if (block[blockForm][blockRotation][i][j] == 1) {
+						space[i + y][j + x / 2] = 2;
+					}
+				}
+			}
+			x = 8;
+			y = 0;
+			CreateRandomForm();
+		}
+	}
+}
+
+void RemoveLine() {
+	for (int i = 15; i >= 0; i--) { // 벽라인 제외한 값
+		int cnt = 0;
+		for (int j = 1; j < 11; j++) { // 
+			if (space[i][j] == 2) {
+				cnt++;
+			}
+		}
+		if (cnt >= 10) { // 벽돌이 다 차있다면
+			for (int j = 0; i - j >= 0; j++) {
+				for (int x = 1; x < 11; x++) {
+					if (i - j - 1 >= 0)
+						space[i - j][x] = space[i - j - 1][x];
+					else      // 천장이면 0저장
+						space[i - j][x] = 0;
+				}
+			}
+		}
+	}
+}
+
+void InputKey() {
+	if (_kbhit()) {
+		key = _getch();
+		switch (key) {
+		case 32: // space
+			blockRotation++;
+			if (blockRotation >= 4) blockRotation = 0;
+			startGroundT = clock();
+			break;
+		case 75: // left
+			if (CheckCrash(x - 2, y) == false) {
+				x -= 2;
+				startGroundT = clock();
+			}
+			break;
+		case 77: // right
+			if (CheckCrash(x + 2, y) == false) {
+				x += 2;
+				startGroundT = clock();
+			}
+			break;
+		case 80: // down
+			if (CheckCrash(x, y + 1) == false)
+				y++;
+			break;
+		}
+		system("cls");
+	}
+}
+
+bool CheckCrash(int x, int y) {
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (block[blockForm][blockRotation][i][j] == 1) {
+				int t = space[i + y][j + x / 2];
+				if (t == 1 || t == 2) { // 벽일 때, 블럭일 때
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
