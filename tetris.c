@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <Windows.h>
+#include <mmsystem.h>
+
+#pragma comment(lib, "winmm.lib") //사운드
 
 // 기본 설정 상수
 #define Width 120  // 창 가로 크기
@@ -24,6 +27,7 @@ int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
+	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -271,7 +275,6 @@ void MenuThree() // 제작자 메뉴
 					else
 						break;
 				}
-
 		}
 	}
 }
