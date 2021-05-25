@@ -526,37 +526,37 @@ void DrawMap()
 				gotoxy(j * 2, i);
 				printf("бр");
 				break;
-			case 2:
+			case 2: // blockForm = 0
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
 				gotoxy(j * 2, i);
 				printf("бс");
 				break;
-			case 3:
+			case 3: // blockForm = 1
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
 				gotoxy(j * 2, i);
 				printf("бс");
 				break;
-			case 4:
+			case 4: // blockForm = 2
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
 				gotoxy(j * 2, i);
 				printf("бс");
 				break;
-			case 5:
+			case 5: // blockForm = 3
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11);
 				gotoxy(j * 2, i);
 				printf("бс");
 				break;
-			case 6:
+			case 6: // blockForm = 4
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
 				gotoxy(j * 2, i);
 				printf("бс");
 				break;
-			case 7:
+			case 7: // blockForm = 5
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);
 				gotoxy(j * 2, i);
 				printf("бс");
 				break;
-			case 8:
+			case 8: // blockForm = 6
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
 				gotoxy(j * 2, i);
 				printf("бс");
