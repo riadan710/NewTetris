@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <mmsystem.h>
 #include <stdlib.h>
+#include "cful.h"
 
 #pragma comment(lib, "winmm.lib") //사운드
 
@@ -530,39 +531,32 @@ void DrawMap()
 				printf("□");
 				break;
 			case 2: // blockForm = 0
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13); // 보라색, T자블럭
 				gotoxy(j * 2, i);
-				printf("■");
+				printf(FG_COLOR(255, 0, 255) "■" RESET); // 보라색, T자블럭
 				break;
 			case 3: // blockForm = 1
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); // 초록색,    ㅁㅁ 블럭
-				gotoxy(j * 2, i);									       	 //           ㅁㅁ
-				printf("■");
+				gotoxy(j * 2, i);
+				printf(FG_COLOR(0, 255, 51) "■" RESET); // 초록색, 오른쪽번개블럭
 				break;
 			case 4: // blockForm = 2
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12); // 빨강색,  ㅁㅁ   블럭
-				gotoxy(j * 2, i);									       	 //             ㅁㅁ
-				printf("■");
+				gotoxy(j * 2, i);
+				printf(FG_COLOR(255, 0, 0) "■" RESET); // 빨간색, 왼쪽번개블럭
 				break;
 			case 5: // blockForm = 3
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11); // 하늘색, 길쭉한 블럭
 				gotoxy(j * 2, i);
-				printf("■");
+				printf(FG_COLOR(0, 255, 255) "■" RESET); // 하늘색, I자 블럭
 				break;
-			case 6: // blockForm = 4                                         //            ㅁ
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9); // 파랑색,    ㅁ  블럭
-				gotoxy(j * 2, i);                                           //           ㅁㅁ
-				printf("■");
+			case 6: // blockForm = 4
+				gotoxy(j * 2, i);
+				printf(FG_COLOR(0, 0, 255) "■" RESET); // 파랑색, L자반대블럭
 				break;
-			case 7: // blockForm = 5                                         //          ㅁ
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8); // 회색,    ㅁ    블럭
-				gotoxy(j * 2, i);                                            //          ㅁㅁ
-				printf("■");
+			case 7: // blockForm = 5
+				gotoxy(j * 2, i);
+				printf(FG_COLOR(255, 102, 0) "■" RESET); // 주황색, L자블럭
 				break;
 			case 8: // blockForm = 6
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); // 노랑색, 네모블럭
 				gotoxy(j * 2, i);
-				printf("■");
+				printf(FG_COLOR(255, 255, 0) "■" RESET); // 노랑색, ㅁ자블럭
 				break;
 			}
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
@@ -574,25 +568,25 @@ void DrawBlock()
 {
 	switch (blockForm) {
 	case 0:
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
+		SET_FG_COLOR(255, 0, 255);
 		break;
 	case 1:
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
+		SET_FG_COLOR(0, 255, 51);
 		break;
 	case 2:
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+		SET_FG_COLOR(255, 0, 0);
 		break;
 	case 3:
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11);
+		SET_FG_COLOR(0, 255, 255);
 		break;
 	case 4:
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
+		SET_FG_COLOR(0, 0, 255);
 		break;
 	case 5:
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);
+		SET_FG_COLOR(255, 102, 0);
 		break;
 	case 6:
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+		SET_FG_COLOR(255, 255, 0);
 		break;
 	}
 
