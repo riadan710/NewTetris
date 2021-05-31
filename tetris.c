@@ -246,7 +246,7 @@ int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -527,37 +527,37 @@ void DrawMap()
 				printf("□");
 				break;
 			case 2: // blockForm = 0
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13);
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 13); // 보라색, T자블럭
 				gotoxy(j * 2, i);
 				printf("■");
 				break;
 			case 3: // blockForm = 1
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
-				gotoxy(j * 2, i);
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10); // 초록색,    ㅁㅁ 블럭
+				gotoxy(j * 2, i);									       	 //           ㅁㅁ
 				printf("■");
 				break;
 			case 4: // blockForm = 2
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
-				gotoxy(j * 2, i);
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12); // 빨강색,  ㅁㅁ   블럭
+				gotoxy(j * 2, i);									       	 //             ㅁㅁ
 				printf("■");
 				break;
 			case 5: // blockForm = 3
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11);
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 11); // 하늘색, 길쭉한 블럭
 				gotoxy(j * 2, i);
 				printf("■");
 				break;
-			case 6: // blockForm = 4
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9);
-				gotoxy(j * 2, i);
+			case 6: // blockForm = 4                                         //            ㅁ
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 9); // 파랑색,    ㅁ  블럭
+				gotoxy(j * 2, i);                                           //           ㅁㅁ
 				printf("■");
 				break;
-			case 7: // blockForm = 5
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);
-				gotoxy(j * 2, i);
+			case 7: // blockForm = 5                                         //          ㅁ
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8); // 회색,    ㅁ    블럭
+				gotoxy(j * 2, i);                                            //          ㅁㅁ
 				printf("■");
 				break;
 			case 8: // blockForm = 6
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14);
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 14); // 노랑색, 네모블럭
 				gotoxy(j * 2, i);
 				printf("■");
 				break;
