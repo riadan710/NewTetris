@@ -254,10 +254,11 @@ bool CheckCrash(int x, int y); // 충돌감지 겹치는게 있으면 true를 �
 void ShowBlockArrivePosition(); // 블럭의 도착 추정 위치 표시
 
 int main() {
+	SetConsoleTitle(TEXT("NEW TETRIS"));
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -516,8 +517,8 @@ void MenuOne() // 게임시작 메뉴
 	while (1)
 	{
 		DrawMap();
-		DrawBlock();
 		ShowBlockArrivePosition();
+		DrawBlock();
 		DropBlock();
 		BlockToGround();
 		RemoveLine();
@@ -525,10 +526,9 @@ void MenuOne() // 게임시작 메뉴
 	}
 }
 
-void CreateRandomForm() { // 블럭이 내려올때마다 랜덤으로 바뀜. 0~6
+void CreateRandomForm() {
 	srand(time(NULL));
-
-	blockForm = (((rand() % 7) + rand()) * rand()) % 7;
+	blockForm = rand() % 7;
 }
 
 void DrawMap()
@@ -762,7 +762,7 @@ void ShowBlockArrivePosition() { // 블럭의 도착 추정 위치 표시
 
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			if (block[blockForm][blockRotation][i][j] == 1) {
+			if (block[blockForm][blockRotation][i][j] == 1 && k != y) {
 				gotoxy(x + j * 2 + 6, k + i + 6);
 				printf("□");
 			}
