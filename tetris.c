@@ -4,6 +4,7 @@
 #include <time.h> 
 #include <stdbool.h>
 #include <mmsystem.h>
+#include <stdlib.h>
 
 #pragma comment(lib, "winmm.lib") //사운드
 
@@ -246,7 +247,7 @@ int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -513,6 +514,8 @@ void MenuOne() // 게임시작 메뉴
 }
 
 void CreateRandomForm() { // 블럭이 내려올때마다 랜덤으로 바뀜. 0~6
+	srand(time(NULL));
+
 	blockForm = rand() % 7;
 }
 
