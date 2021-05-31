@@ -517,7 +517,7 @@ void MenuOne() // 게임시작 메뉴
 void CreateRandomForm() { // 블럭이 내려올때마다 랜덤으로 바뀜. 0~6
 	srand(time(NULL));
 
-	blockForm = rand() % 7;
+	blockForm = (((rand() % 7) + rand()) * rand()) % 7;
 }
 
 void DrawMap()
@@ -528,7 +528,7 @@ void DrawMap()
 			switch (space[i][j]) {
 			case 1:
 				gotoxy(j * 2, i);
-				printf("□");
+				printf("▣");
 				break;
 			case 2: // blockForm = 0
 				gotoxy(j * 2, i);
@@ -548,7 +548,7 @@ void DrawMap()
 				break;
 			case 6: // blockForm = 4
 				gotoxy(j * 2, i);
-				printf(FG_COLOR(0, 0, 255) "■" RESET); // 파랑색, L자반대블럭
+				printf(FG_COLOR(0, 102, 255) "■" RESET); // 파랑색, L자반대블럭
 				break;
 			case 7: // blockForm = 5
 				gotoxy(j * 2, i);
@@ -568,25 +568,25 @@ void DrawBlock()
 {
 	switch (blockForm) {
 	case 0:
-		SET_FG_COLOR(255, 0, 255);
+		SET_FG_COLOR(255, 0, 255); // 보라색, T자블럭
 		break;
 	case 1:
-		SET_FG_COLOR(0, 255, 51);
+		SET_FG_COLOR(0, 255, 51); // 초록색, 오른쪽번개블럭
 		break;
 	case 2:
-		SET_FG_COLOR(255, 0, 0);
+		SET_FG_COLOR(255, 0, 0); // 빨간색, 왼쪽번개블럭
 		break;
 	case 3:
-		SET_FG_COLOR(0, 255, 255);
+		SET_FG_COLOR(0, 255, 255); // 하늘색, I자 블럭
 		break;
 	case 4:
-		SET_FG_COLOR(0, 0, 255);
+		SET_FG_COLOR(0, 102, 255); // 파랑색, L자반대블럭
 		break;
 	case 5:
-		SET_FG_COLOR(255, 102, 0);
+		SET_FG_COLOR(255, 102, 0); // 주황색, L자블럭
 		break;
 	case 6:
-		SET_FG_COLOR(255, 255, 0);
+		SET_FG_COLOR(255, 255, 0); // 노랑색, ㅁ자블럭
 		break;
 	}
 
