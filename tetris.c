@@ -251,6 +251,7 @@ void RemoveLine(); // 블럭제거 후 한칸씩 땡김
 void InputKey();
 void CreateRandomForm(); // 블럭이 내려올때마다 랜덤으로 바뀜. 0~6
 bool CheckCrash(int x, int y); // 충돌감지 겹치는게 있으면 true를 반환
+void ShowBlockArrivePosition(); // 블럭의 도착 추정 위치 표시
 
 int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
@@ -516,6 +517,7 @@ void MenuOne() // 게임시작 메뉴
 	{
 		DrawMap();
 		DrawBlock();
+		ShowBlockArrivePosition();
 		DropBlock();
 		BlockToGround();
 		RemoveLine();
@@ -749,4 +751,21 @@ bool CheckCrash(int x, int y) { // 충돌감지 겹치는게 있으면 true를 �
 		}
 	}
 	return false;
+}
+
+void ShowBlockArrivePosition() { // 블럭의 도착 추정 위치 표시
+	int k = y;
+	while (1) {
+		if (CheckCrash(x, k + 1) == false) k++;
+		else break;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (block[blockForm][blockRotation][i][j] == 1) {
+				gotoxy(x + j * 2 + 6, k + i + 6);
+				printf("□");
+			}
+		}
+	}
 }
