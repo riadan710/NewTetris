@@ -10,12 +10,14 @@
 #pragma comment(lib, "winmm.lib") //사운드
 
 clock_t startDropT, endT, startGroundT;
+clock_t startSpaceT, endSpaceT;
 
 int x = 8, y = 0;
 RECT blockSize;
 int blockForm;
 int blockRotation = 0;
 int key;
+bool isSpace = false;
 
 #define Width 90  // 창 가로 크기
 #define Height 30  // 창 세로 크기
@@ -507,6 +509,7 @@ void MenuOne() // 게임시작 메뉴
 {
 	system("cls");
 	startDropT = clock();
+	endSpaceT = clock();
 	CreateRandomForm();
 
 	while (1)
@@ -572,7 +575,7 @@ void DrawMap()
 				break;
 			case 7: // blockForm = 5
 				gotoxy(j * 2 + 6, i + 6);
-				printf(FG_COLOR(255, 102, 0) "■" RESET); // 주황색, L자블럭
+				printf(FG_COLOR(255, 127, 0) "■" RESET); // 주황색, L자블럭
 				break;
 			case 8: // blockForm = 6
 				gotoxy(j * 2 + 6, i + 6);
@@ -603,7 +606,7 @@ void DrawBlock()
 		SET_FG_COLOR(0, 102, 255); // 파랑색, L자반대블럭
 		break;
 	case 5:
-		SET_FG_COLOR(255, 102, 0); // 주황색, L자블럭
+		SET_FG_COLOR(255, 127, 0); // 주황색, L자블럭
 		break;
 	case 6:
 		SET_FG_COLOR(255, 255, 0); // 노랑색, ㅁ자블럭
@@ -635,7 +638,7 @@ void DropBlock() // 0.8초마다 블럭을 한칸씩 밑으로 내림
 
 void BlockToGround() { // 1초동안 땅에 닿아있을때 동작이 없으면 땅으로 변함, 랜덤한 블럭을 만들고 위로 올림
 	if (CheckCrash(x, y + 1) == true) {
-		if ((float)(endT - startGroundT) > 1000) {
+		if ((float)(endT - startGroundT) > 1000 || isSpace == true) {
 			// 현재 블록 저장
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++) {
@@ -666,6 +669,7 @@ void BlockToGround() { // 1초동안 땅에 닿아있을때 동작이 없으면 
 					}
 				}
 			}
+			isSpace = false;
 			x = 8;
 			y = 1;
 			CreateRandomForm();
@@ -716,6 +720,17 @@ void InputKey() {
 		case 80: // down
 			if (CheckCrash(x, y + 1) == false)
 				y++;
+			break;
+		case 32: // space
+			endSpaceT = clock();
+			if ((float)(endSpaceT - startSpaceT >= 500)) { // 연속입력 방지
+				while (1) {
+					if (CheckCrash(x, y + 1) == false) y++;
+					else break;
+				}
+				isSpace = true;
+			}
+			startSpaceT = clock();
 			break;
 		}
 		system("cls");
