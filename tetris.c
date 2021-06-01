@@ -18,6 +18,7 @@ int blockForm;
 int blockRotation = 0;
 int key;
 bool isSpace = false;
+int blockNum[7] = { 0 }, blockCnt = 8;
 
 #define Width 90  // 창 가로 크기
 #define Height 30  // 창 세로 크기
@@ -254,11 +255,12 @@ bool CheckCrash(int x, int y); // 충돌감지 겹치는게 있으면 true를 �
 void ShowBlockArrivePosition(); // 블럭의 도착 추정 위치 표시
 
 int main() {
+	srand(time(NULL));
 	SetConsoleTitle(TEXT("NEW TETRIS"));
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -526,9 +528,28 @@ void MenuOne() // 게임시작 메뉴
 	}
 }
 
-void CreateRandomForm() {
-	srand(time(NULL));
-	blockForm = rand() % 7;
+void CreateRandomForm() { // 랜덤 수 생성 (7bag 시스템 구현)
+	if (blockCnt < 7) {
+		blockForm = blockNum[blockCnt++];
+		return;
+	}
+	blockCnt = 0; // 여기가 실행되면 blockCnt가 7일때 이므로 초기화
+
+	for (int i = 0; i < 7; i++)
+		blockNum[i] = i;
+	
+	int i, j;
+	int n = 25; // 변경 횟수
+	while (n--) {
+		int tmp;
+		i = rand() % 7;
+		j = rand() % 7;
+
+		tmp = blockNum[i];
+		blockNum[i] = blockNum[j];
+		blockNum[j] = tmp;
+	}
+	CreateRandomForm();
 }
 
 void DrawMap()
