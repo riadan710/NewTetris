@@ -253,6 +253,7 @@ void InputKey();
 void CreateRandomForm(); // 블럭이 내려올때마다 랜덤으로 바뀜. 0~6
 bool CheckCrash(int x, int y); // 충돌감지 겹치는게 있으면 true를 반환
 void ShowBlockArrivePosition(); // 블럭의 도착 추정 위치 표시
+void DrawUI(); // Map 옆부분 UI 그리기
 
 int main() {
 	srand(time(NULL));
@@ -610,6 +611,10 @@ void DrawMap()
 	}
 }
 
+void DrawUI() {
+
+}
+
 void DrawBlock()
 {
 	switch (blockForm) {
@@ -785,7 +790,29 @@ void ShowBlockArrivePosition() { // 블럭의 도착 추정 위치 표시
 		for (int j = 0; j < 4; j++) {
 			if (block[blockForm][blockRotation][i][j] == 1 && k != y) {
 				gotoxy(x + j * 2 + 6, k + i + 6);
-				printf("□");
+				switch (blockForm) {
+				case 0:
+					printf(FG_COLOR(255, 0, 255) "□" RESET); // 보라색, T자블럭
+					break;
+				case 1:
+					printf(FG_COLOR(0, 255, 51) "□" RESET); // 초록색, 오른쪽번개블럭
+					break;
+				case 2:
+					printf(FG_COLOR(255, 0, 0) "□" RESET); // 빨간색, 왼쪽번개블럭
+					break;
+				case 3:
+					printf(FG_COLOR(0, 255, 255) "□" RESET); // 하늘색, I자 블럭
+					break;
+				case 4:
+					printf(FG_COLOR(0, 102, 255) "□" RESET); // 파랑색, L자반대블럭
+					break;
+				case 5:
+					printf(FG_COLOR(255, 127, 0) "□" RESET); // 주황색, L자블럭
+					break;
+				case 6:
+					printf(FG_COLOR(255, 255, 0) "□" RESET); // 노랑색, ㅁ자블럭
+					break;
+				}
 			}
 		}
 	}
