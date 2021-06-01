@@ -19,6 +19,9 @@ int blockRotation = 0;
 int key;
 bool isSpace = false;
 int blockNum[7] = { 0 }, blockCnt = 8;
+bool isHold = false;
+bool isHoldAlready = false;
+int holdBlockForm;
 
 #define Width 90  // 창 가로 크기
 #define Height 30  // 창 세로 크기
@@ -280,6 +283,7 @@ bool CheckCrash(int x, int y); // 충돌감지 겹치는게 있으면 true를 �
 void ShowBlockArrivePosition(); // 블럭의 도착 추정 위치 표시
 void DrawUI(); // Map 옆부분 UI 그리기
 void ShowNextBlock(); // 다음 블럭 표시
+void HoldFunction(); // 블럭 홀드 기능
 
 int main() {
 	srand(time(NULL));
@@ -558,6 +562,7 @@ void MenuOne() // 게임시작 메뉴
 }
 
 void CreateRandomForm() { // 랜덤 수 생성 (7bag 시스템 구현)
+	isHoldAlready = false;
 	if (blockCnt < 7) {
 		blockForm = blockNum[blockCnt++];
 		return;
@@ -898,6 +903,10 @@ void InputKey() {
 			}
 			startSpaceT = clock();
 			break;
+		case 67: // C
+		case 99: // c
+			HoldFunction();
+			break;
 		}
 		system("cls");
 	}
@@ -953,5 +962,75 @@ void ShowBlockArrivePosition() { // 블럭의 도착 추정 위치 표시
 				}
 			}
 		}
+	}
+}
+
+void HoldFunction() { // 블럭 홀드 기능
+	if (isHoldAlready == false) {
+		for (int i = 15; i < 19; i++) {
+			for (int j = 1; j < 6; j++) {
+				UIspace[i][j] = 0;
+			}
+		}
+
+		switch (blockForm) {
+		case 0: // T자
+			UIspace[16][3] = 2;
+			UIspace[17][2] = 2;
+			UIspace[17][3] = 2;
+			UIspace[17][4] = 2;
+			break;
+		case 1: // 오른쪽번개블럭
+			UIspace[16][3] = 3;
+			UIspace[16][4] = 3;
+			UIspace[17][2] = 3;
+			UIspace[17][3] = 3;
+			break;
+		case 2: // 왼쪽번개블럭
+			UIspace[16][2] = 4;
+			UIspace[16][3] = 4;
+			UIspace[17][3] = 4;
+			UIspace[17][4] = 4;
+			break;
+		case 3: // I자 블럭
+			UIspace[17][2] = 5;
+			UIspace[17][3] = 5;
+			UIspace[17][4] = 5;
+			UIspace[17][5] = 5;
+			break;
+		case 4: // L자 반대블럭
+			UIspace[15][3] = 6;
+			UIspace[16][3] = 6;
+			UIspace[17][3] = 6;
+			UIspace[17][4] = 6;
+			break;
+		case 5: // L자블럭
+			UIspace[15][3] = 7;
+			UIspace[16][3] = 7;
+			UIspace[17][2] = 7;
+			UIspace[17][3] = 7;
+			break;
+		case 6: // 네모블럭
+			UIspace[16][2] = 8;
+			UIspace[16][3] = 8;
+			UIspace[17][2] = 8;
+			UIspace[17][3] = 8;
+			break;
+		}
+
+		if (isHold == true) {
+			int tmp = blockForm;
+			blockForm = holdBlockForm;
+			holdBlockForm = tmp;
+			isHoldAlready = true;
+		}
+		else {
+			isHold = true;
+			holdBlockForm = blockForm;
+			CreateRandomForm();
+		}
+		system("cls");
+		x = 8;
+		y = 1;
 	}
 }
