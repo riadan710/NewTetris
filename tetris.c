@@ -22,6 +22,7 @@ int blockNum[7] = { 0 }, blockCnt = 8;
 bool isHold = false;
 bool isHoldAlready = false;
 int holdBlockForm;
+bool isMusic = true;
 
 #define Width 90  // 창 가로 크기
 #define Height 30  // 창 세로 크기
@@ -284,6 +285,7 @@ void ShowBlockArrivePosition(); // 블럭의 도착 추정 위치 표시
 void DrawUI(); // Map 옆부분 UI 그리기
 void ShowNextBlock(); // 다음 블럭 표시
 void HoldFunction(); // 블럭 홀드 기능
+void OptionMenu(); // 옵션 메뉴
 
 int main() {
 	srand(time(NULL));
@@ -291,7 +293,7 @@ int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -540,6 +542,67 @@ void MenuThree() // 제작자 메뉴
 	}
 }
 
+void OptionMenu() // 옵션 메뉴
+{
+	system("cls");
+	gotoxy(Width / 2 - 5, Height / 2 - 12);
+	printf("옵   션");
+	gotoxy(Width / 2 - 7, Height / 2 - 4);
+	printf("배 경 음 악");
+	gotoxy(Width / 2 - 9, Height / 2 + 1);
+	printf("ON");
+	gotoxy(Width / 2 + 3, Height / 2 + 1);
+	printf("OFF");
+	gotoxy(Width / 2 + 8, Height / 2 + 1);
+	printf("◀");
+
+	int return_n = 13;
+	while (1) { // 키보드 움직임
+		int key;
+		if (kbhit()) {
+			key = getch();
+			if (key == 224 || key == 0) {
+				key = getch();
+				switch (key) {
+				case 75: // 왼쪽
+					gotoxy(Width / 2 - 5 + return_n, Height / 2 + 1);
+					printf("   ");
+					return_n = 0;
+					gotoxy(Width / 2 - 5, Height / 2 + 1);
+					printf("◀");
+					break;
+				case 77: // 오른쪽
+					return_n = 13;
+					gotoxy(Width / 2 + 8 - return_n, Height / 2 + 1);
+					printf("   ");
+					gotoxy(Width / 2 + 8, Height / 2 + 1);
+					printf("◀");
+					break;
+				default:
+					break;
+				}
+			}
+			else {
+				if (key == 13) // 엔터
+				{
+					if (return_n == 0) // ON
+					{
+						if (isMusic == false) PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+						isMusic = true;
+						break;
+					}
+					else // OFF
+					{
+						PlaySound(NULL, 0, 0);
+						isMusic = false;
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
 void MenuOne() // 게임시작 메뉴
 {
 	system("cls");
@@ -712,6 +775,11 @@ void DrawUI() {
 	printf("NEXT BLOCK");
 	gotoxy(35, 18);
 	printf("H O L D");
+
+	gotoxy(33, 1);
+	printf("ESC : OPTION,");
+	gotoxy(38, 3);
+	printf("일시정지");
 
 	for (int i = 0; i < 22; i++) {
 		for (int j = 0; j < 20; j++) {
@@ -906,6 +974,9 @@ void InputKey() {
 		case 67: // C
 		case 99: // c
 			HoldFunction();
+			break;
+		case 27: // ESC
+			OptionMenu();
 			break;
 		}
 		system("cls");
