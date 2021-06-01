@@ -286,6 +286,7 @@ void DrawUI(); // Map 옆부분 UI 그리기
 void ShowNextBlock(); // 다음 블럭 표시
 void HoldFunction(); // 블럭 홀드 기능
 void OptionMenu(); // 옵션 메뉴
+void CheckEnding(); // 게임 종료 체크
 
 int main() {
 	srand(time(NULL));
@@ -293,7 +294,7 @@ int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -910,8 +911,9 @@ void BlockToGround() { // 1초동안 땅에 닿아있을때 동작이 없으면 
 			}
 			isSpace = false;
 			x = 8;
-			y = 1;
+			y = 0;
 			CreateRandomForm();
+			CheckEnding();
 		}
 	}
 }
@@ -931,6 +933,43 @@ void RemoveLine() {
 					space[j][k] = space[j - 1][k];
 				}
 			}
+		}
+	}
+}
+
+void CheckEnding() {
+	for (int i = 1; i < 11; i++) {
+		if (space[1][i] == 2 || space[1][i] == 3 || space[1][i] == 4 || space[1][i] == 5 || space[1][i] == 6 || space[1][i] == 7 || space[1][i] == 8) {
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+			gotoxy(Width / 2 - 22, Height / 2 - 7);
+			printf("                                         ");
+			gotoxy(Width / 2 - 22, Height / 2 - 6);
+			printf("   ======================================   \n");
+			gotoxy(Width / 2 - 23, Height / 2 - 5);
+			printf("   ||                                    ||   \n");
+			gotoxy(Width / 2 - 23, Height / 2 - 4);
+			printf("   ||                                    ||   \n");
+			gotoxy(Width / 2 - 23, Height / 2 - 3);
+			printf("   ||                                    ||   \n");
+			gotoxy(Width / 2 - 23, Height / 2 - 2);
+			printf("   ||                                    ||   \n");
+			gotoxy(Width / 2 - 23, Height / 2 - 1);
+			printf("   ||                                    ||   \n");
+			gotoxy(Width / 2 - 23, Height / 2);
+			printf("   ||                                    ||   \n");
+			gotoxy(Width / 2 - 23, Height / 2 + 1);
+			printf("   ||                                    ||   \n");
+			gotoxy(Width / 2 - 23, Height / 2 + 2);
+			printf("   ||                                    ||   \n");
+			gotoxy(Width / 2 - 22, Height / 2 + 3);
+			printf("   ======================================   \n");
+			gotoxy(Width / 2 - 22, Height / 2 + 4 );
+			printf("                                         ");
+			gotoxy(Width / 2 - 6, Height / 2 - 2);
+			printf("게 임 종 료");
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+			Sleep(10000);
+			exit(0);
 		}
 	}
 }
