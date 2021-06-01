@@ -235,6 +235,31 @@ int space[1 + 20 + 1][10 + 2] = {  // 세로 (위벽)1+15+1(아래벽)칸, 가�
 	{1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
+int UIspace[22][20] = {
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+};
+
 void Console_Size(); // 콘솔 사이즈 설정
 void CursorView(char show); // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 void gotoxy(int x, int y); //커서 이동 함수
@@ -254,6 +279,7 @@ void CreateRandomForm(); // 블럭이 내려올때마다 랜덤으로 바뀜. 0~
 bool CheckCrash(int x, int y); // 충돌감지 겹치는게 있으면 true를 반환
 void ShowBlockArrivePosition(); // 블럭의 도착 추정 위치 표시
 void DrawUI(); // Map 옆부분 UI 그리기
+void ShowNextBlock(); // 다음 블럭 표시
 
 int main() {
 	srand(time(NULL));
@@ -520,6 +546,8 @@ void MenuOne() // 게임시작 메뉴
 	while (1)
 	{
 		DrawMap();
+		ShowNextBlock();
+		DrawUI();
 		ShowBlockArrivePosition();
 		DrawBlock();
 		DropBlock();
@@ -551,6 +579,69 @@ void CreateRandomForm() { // 랜덤 수 생성 (7bag 시스템 구현)
 		blockNum[j] = tmp;
 	}
 	CreateRandomForm();
+}
+
+void ShowNextBlock() {	// 다음 블럭 표시
+	for (int i = 4; i < 8; i++) {
+		for (int j = 1; j < 6; j++) {
+			UIspace[i][j] = 0;
+		}
+	}
+
+	if (blockCnt != 7) {
+		switch (blockNum[blockCnt]) {
+		case 0: // T자
+			UIspace[5][3] = 2;
+			UIspace[6][2] = 2;
+			UIspace[6][3] = 2;
+			UIspace[6][4] = 2;
+			break;
+		case 1: // 오른쪽번개블럭
+			UIspace[5][3] = 3;
+			UIspace[5][4] = 3;
+			UIspace[6][2] = 3;
+			UIspace[6][3] = 3;
+			break;
+		case 2: // 왼쪽번개블럭
+			UIspace[5][2] = 4;
+			UIspace[5][3] = 4;
+			UIspace[6][3] = 4;
+			UIspace[6][4] = 4;
+			break;
+		case 3: // I자 블럭
+			UIspace[6][2] = 5;
+			UIspace[6][3] = 5;
+			UIspace[6][4] = 5;
+			UIspace[6][5] = 5;
+			break;
+		case 4: // L자 반대블럭
+			UIspace[4][3] = 6;
+			UIspace[5][3] = 6;
+			UIspace[6][3] = 6;
+			UIspace[6][4] = 6;
+			break;
+		case 5: // L자블럭
+			UIspace[4][3] = 7;
+			UIspace[5][3] = 7;
+			UIspace[6][2] = 7;
+			UIspace[6][3] = 7;
+			break;
+		case 6: // 네모블럭
+			UIspace[5][2] = 8;
+			UIspace[5][3] = 8;
+			UIspace[6][2] = 8;
+			UIspace[6][3] = 8;
+			break;
+		}
+	}
+	else {
+		UIspace[5][2] = 9;
+		UIspace[5][3] = 9;
+		UIspace[5][4] = 9;
+		UIspace[6][2] = 9;
+		UIspace[6][3] = 9;
+		UIspace[6][4] = 9;
+	}
 }
 
 void DrawMap()
@@ -612,7 +703,54 @@ void DrawMap()
 }
 
 void DrawUI() {
+	gotoxy(34, 7);
+	printf("NEXT BLOCK");
+	gotoxy(35, 18);
+	printf("H O L D");
 
+	for (int i = 0; i < 22; i++) {
+		for (int j = 0; j < 20; j++) {
+			switch (UIspace[i][j]) {
+			case 1:
+				gotoxy(j * 2 + 32, i + 6);
+				printf("▣");
+				break;
+			case 2: // blockForm = 0
+				gotoxy(j * 2 + 32, i + 6);
+				printf(FG_COLOR(255, 0, 255) "■" RESET); // 보라색, T자블럭
+				break;
+			case 3: // blockForm = 1
+				gotoxy(j * 2 + 32, i + 6);
+				printf(FG_COLOR(0, 255, 51) "■" RESET); // 초록색, 오른쪽번개블럭
+				break;
+			case 4: // blockForm = 2
+				gotoxy(j * 2 + 32, i + 6);
+				printf(FG_COLOR(255, 0, 0) "■" RESET); // 빨간색, 왼쪽번개블럭
+				break;
+			case 5: // blockForm = 3
+				gotoxy(j * 2 + 32, i + 6);
+				printf(FG_COLOR(0, 255, 255) "■" RESET); // 하늘색, I자 블럭
+				break;
+			case 6: // blockForm = 4
+				gotoxy(j * 2 + 32, i + 6);
+				printf(FG_COLOR(0, 102, 255) "■" RESET); // 파랑색, L자반대블럭
+				break;
+			case 7: // blockForm = 5
+				gotoxy(j * 2 + 32, i + 6);
+				printf(FG_COLOR(255, 127, 0) "■" RESET); // 주황색, L자블럭
+				break;
+			case 8: // blockForm = 6
+				gotoxy(j * 2 + 32, i + 6);
+				printf(FG_COLOR(255, 255, 0) "■" RESET); // 노랑색, ㅁ자블럭
+				break;
+			case 9:
+				gotoxy(j * 2 + 32, i + 6);
+				printf("?");
+				break;
+			}
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+		}
+	}
 }
 
 void DrawBlock()
