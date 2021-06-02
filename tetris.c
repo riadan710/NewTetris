@@ -23,6 +23,7 @@ bool isHold = false;
 bool isHoldAlready = false;
 int holdBlockForm;
 bool isMusic = true;
+int colorGauge[7] = { 0 };
 
 #define Width 90  // 창 가로 크기
 #define Height 30  // 창 세로 크기
@@ -287,6 +288,7 @@ void ShowNextBlock(); // 다음 블럭 표시
 void HoldFunction(); // 블럭 홀드 기능
 void OptionMenu(); // 옵션 메뉴
 void CheckEnding(); // 게임 종료 체크
+void Gauge(int line); // 경험치 함수
 
 int main() {
 	srand(time(NULL));
@@ -686,14 +688,14 @@ void ShowNextBlock() {	// 다음 블럭 표시
 		case 4: // L자 반대블럭
 			UIspace[4][3] = 6;
 			UIspace[5][3] = 6;
+			UIspace[6][2] = 6;
 			UIspace[6][3] = 6;
-			UIspace[6][4] = 6;
 			break;
 		case 5: // L자블럭
 			UIspace[4][3] = 7;
 			UIspace[5][3] = 7;
-			UIspace[6][2] = 7;
 			UIspace[6][3] = 7;
+			UIspace[6][4] = 7;
 			break;
 		case 6: // 네모블럭
 			UIspace[5][2] = 8;
@@ -825,6 +827,53 @@ void DrawUI() {
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 		}
 	}
+
+	for (int j = 1; j <= 7; j++) {
+		switch (j) {
+		case 1:
+			gotoxy(50, j * 2);
+			printf("보라색");
+			for (int i = 0; i < colorGauge[j - 1]; i++)
+				printf(FG_COLOR(255, 0, 255) "■" RESET);
+			break;
+		case 2:
+			gotoxy(50, j * 2);
+			printf("초록색");
+			for (int i = 0; i < colorGauge[j - 1]; i++)
+				printf(FG_COLOR(0, 255, 51) "■" RESET);
+			break;
+		case 3:
+			gotoxy(50, j * 2);
+			printf("빨강색");
+			for (int i = 0; i < colorGauge[j - 1]; i++)
+				printf(FG_COLOR(255, 0, 0) "■" RESET);
+			break;
+		case 4:
+			gotoxy(50, j * 2);
+			printf("하늘색");
+			for (int i = 0; i < colorGauge[j - 1]; i++)
+				printf(FG_COLOR(0, 255, 255) "■" RESET);
+			break;
+		case 5:
+			gotoxy(50, j * 2);
+			printf("파랑색");
+			for (int i = 0; i < colorGauge[j - 1]; i++)
+				printf(FG_COLOR(0, 102, 255) "■" RESET);
+			break;
+		case 6:
+			gotoxy(50, j * 2);
+			printf("주황색");
+			for (int i = 0; i < colorGauge[j - 1]; i++)
+				printf(FG_COLOR(255, 127, 0) "■" RESET);
+			break;
+		case 7:
+			gotoxy(50, j * 2);
+			printf("노랑색");
+			for (int i = 0; i < colorGauge[j - 1]; i++)
+				printf(FG_COLOR(255, 255, 0) "■" RESET);
+			break;
+		}
+	}
 }
 
 void DrawBlock()
@@ -928,12 +977,22 @@ void RemoveLine() {
 		}
 
 		if (cnt >= 10) { // 한줄이 다 찼으면
+			Gauge(i);
 			for (int j = i; j > 1; j--) {
 				for (int k = 1; k < 11; k++) {
 					space[j][k] = space[j - 1][k];
 				}
 			}
 		}
+	}
+}
+
+void Gauge(int line) // 경험치 함수 (칸 최대 16개)
+{
+	for (int j = 0; j < 10; j++) {
+		int color = space[line][j + 1] - 2;
+		if (colorGauge[color] >= 15) continue;
+		colorGauge[color]++;
 	}
 }
 
@@ -1045,7 +1104,7 @@ void ShowBlockArrivePosition() { // 블럭의 도착 추정 위치 표시
 
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			if (block[blockForm][blockRotation][i][j] == 1 && k != y) {
+			if (block[blockForm][blockRotation][i][j] == 1) {
 				gotoxy(x + j * 2 + 6, k + i + 6);
 				switch (blockForm) {
 				case 0:
@@ -1111,14 +1170,14 @@ void HoldFunction() { // 블럭 홀드 기능
 		case 4: // L자 반대블럭
 			UIspace[15][3] = 6;
 			UIspace[16][3] = 6;
+			UIspace[17][2] = 6;
 			UIspace[17][3] = 6;
-			UIspace[17][4] = 6;
 			break;
 		case 5: // L자블럭
 			UIspace[15][3] = 7;
 			UIspace[16][3] = 7;
-			UIspace[17][2] = 7;
 			UIspace[17][3] = 7;
+			UIspace[17][4] = 7;
 			break;
 		case 6: // 네모블럭
 			UIspace[16][2] = 8;
