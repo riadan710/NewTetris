@@ -13,25 +13,31 @@
 clock_t startDropT, endT, startGroundT;
 clock_t startSpaceT, endSpaceT;
 
-int x = 8, y = 0;
 RECT blockSize;
+
+int x = 8, y = 0;
 int blockForm;
 int blockRotation = 0;
 int key;
-bool isSpace = false;
 int blockNum[7] = { 0 }, blockCnt = 8;
+int holdBlockForm;
+int colorGauge[7] = { 0 };
+int gaugelimit = 0;
+int themenum = 0;
+int downspeed = 0;
+
+bool isSpace = false;
 bool isHold = false;
 bool isHoldAlready = false;
-int holdBlockForm;
 bool isMusic = true;
-int colorGauge[7] = { 0 };
 bool isFirst = true;
+bool isClear[3][5] = { false };
+bool isEnter = false;
 
 #define Width 90  // 창 가로 크기
 #define Height 30  // 창 세로 크기
 #define kbhit _kbhit
 #define getch _getch
-
 #define boardWidth 30
 #define boardHeight 27
 
@@ -270,10 +276,22 @@ int UIspace[22][20] = {
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 };
 
+int Themespace[10][10] = {
+	{1,1,1,1,1,1,1,1,1,1},
+	{1,0,0,0,0,0,0,0,0,1},
+	{1,0,0,2,2,2,0,0,0,1},
+	{1,0,2,0,0,0,2,0,0,1},
+	{1,0,0,0,0,2,0,0,0,1},
+	{1,0,0,0,2,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,1},
+	{1,0,0,0,2,0,0,0,0,1},
+	{1,0,0,0,0,0,0,0,0,1},
+	{1,1,1,1,1,1,1,1,1,1}
+};
+
 void Console_Size(); // 콘솔 사이즈 설정
 void CursorView(char show); // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 void gotoxy(int x, int y); //커서 이동 함수
-
 void DesignMainMenu(); // 메인 메뉴 디자인
 int MainMenu(); // 메인 메뉴
 void MenuTwo(); // 조작법 메뉴
@@ -297,6 +315,10 @@ void Gauge(int line); // 경험치 함수
 void DeleteArea(int x1, int y1, int x2, int y2); // 범위 지정 삭제
 void RemoveSelectedLine(); // 원하는 줄 지우기
 void RemoveSelectedColor(); // 원하는 색 지우기
+void SelectTheme(); // 테마 선택 메뉴
+void Theme1();
+void Theme2();
+void Theme3();
 
 int main() {
 	srand(time(NULL));
@@ -313,7 +335,8 @@ int main() {
 		switch (return_n)
 		{
 		case 0:
-			MenuOne();
+			SelectTheme();
+			//MenuOne();
 			break;
 		case 3:
 			MenuTwo();
@@ -614,6 +637,123 @@ void OptionMenu() // 옵션 메뉴
 	}
 }
 
+void SelectTheme() {
+	system("cls");
+	gotoxy(Width / 2 - 9, Height / 2 - 12);
+	printf("테마를 선택하세요");
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			switch (Themespace[i][j]) {
+			case 1:
+				gotoxy(j * 2 + 6, i + 10);
+				if (isClear[0][0] == false) printf("▣");
+				else printf(FG_COLOR(255, 0, 0) "▣" RESET);
+
+				gotoxy(j * 2 + 35, i + 10);
+				if (isClear[1][0] == false) printf("▣");
+				else printf(FG_COLOR(255, 255, 0) "▣" RESET);
+
+				gotoxy(j * 2 + 64, i + 10);
+				if (isClear[2][0] == false) printf("▣");
+				else printf(FG_COLOR(0, 102, 255) "▣" RESET);
+				break;
+			case 2:
+				gotoxy(j * 2 + 6, i + 10);
+				if (isClear[0][0] == false) printf("■");
+				else printf(FG_COLOR(255, 0, 0) "■" RESET);
+
+				gotoxy(j * 2 + 35, i + 10);
+				if (isClear[1][0] == false) printf("■");
+				else printf(FG_COLOR(255, 255, 0) "■" RESET);
+
+				gotoxy(j * 2 + 64, i + 10);
+				if (isClear[2][0] == false) printf("■");
+				else printf(FG_COLOR(0, 102, 255) "■" RESET);
+				break;
+			}
+		}
+	}
+	gotoxy(13, 8);
+	printf("튀김류");
+	gotoxy(43, 8);
+	printf("밥류");
+	gotoxy(69, 8);
+	printf("디저트류");
+
+	int return_n = 0;
+	gotoxy(15, 22);
+	printf("▲");
+	gotoxy(14, 23);
+	printf("▲▲");
+
+	while (1) { // 키보드 움직임
+		int key;
+		if (kbhit()) {
+			key = getch();
+			if (key == 224 || key == 0) {
+				key = getch();
+				switch (key) {
+				case 75: // 왼쪽
+					gotoxy(15 + return_n, 22);
+					printf("  ");
+					gotoxy(14 + return_n, 23);
+					printf("    ");
+					return_n -= 29;
+					if (return_n < 0) return_n = 0;
+					gotoxy(15 + return_n, 22);
+					printf("▲");
+					gotoxy(14 + return_n, 23);
+					printf("▲▲");
+					break;
+				case 77: // 오른쪽
+					gotoxy(15 + return_n, 22);
+					printf("  ");
+					gotoxy(14 + return_n, 23);
+					printf("    ");
+					return_n += 29;
+					if (return_n > 58) return_n = 58;
+					gotoxy(15 + return_n, 22);
+					printf("▲");
+					gotoxy(14 + return_n, 23);
+					printf("▲▲");
+					break;
+				default:
+					break;
+				}
+			}
+			else {
+				if (key == 13) // 엔터
+				{
+					if (return_n == 0) // 튀김류
+						Theme1();
+					else if (return_n == 29)
+						Theme2();
+					else
+						Theme3();
+				}
+			}
+		}
+	}
+}
+
+void Theme1() {
+	themenum = 1;
+	system("cls");
+	MenuOne();
+}
+
+void Theme2() {
+	themenum = 2;
+	system("cls");
+	MenuOne();
+}
+
+void Theme3() {
+	themenum = 3;
+	system("cls");
+	MenuOne();
+}
+
 void DeleteArea(int x1, int y1, int x2, int y2)
 {
 	for (int i = x1; i <= x2; i += 2) {
@@ -793,53 +933,73 @@ void DrawMap()
 }
 
 void DrawUI() {
-	gotoxy(34, 7);
+	gotoxy(34, 9);
 	printf("NEXT BLOCK");
-	gotoxy(35, 18);
+	gotoxy(35, 20);
 	printf("H O L D");
 
 	gotoxy(33, 1);
-	printf("ESC : OPTION,");
-	gotoxy(38, 3);
-	printf("일시정지");
+	printf("ESC : Option,");
+	gotoxy(39, 3);
+	printf("Pause");
+
+	int stagenum = 0;
+	for (int i = 0; i < 4; i++) {
+		if (isClear[themenum][i] == false) {
+			stagenum = i;
+			break;
+		}
+	}
+	stagenum++;
+
+	if (stagenum == 1) downspeed = 800;
+	else if (stagenum == 2) downspeed = 650;
+	else if (stagenum == 3) downspeed = 500;
+	else downspeed = 350;
+	
+	stagenum = 3;
+
+	SET_FG_COLOR(255, 51, 51);
+	gotoxy(35, 6);
+	printf("STAGE %d" RESET, stagenum);
 
 	for (int i = 0; i < 22; i++) {
 		for (int j = 0; j < 20; j++) {
 			switch (UIspace[i][j]) {
 			case 1:
-				gotoxy(j * 2 + 32, i + 6);
+				gotoxy(j * 2 + 32, i + 8);
 				printf("▣");
 				break;
 			case 2: // blockForm = 0
-				gotoxy(j * 2 + 32, i + 6);
+				gotoxy(j * 2 + 32, i + 8);
 				printf(FG_COLOR(255, 0, 255) "■" RESET); // 보라색, T자블럭
 				break;
 			case 3: // blockForm = 1
-				gotoxy(j * 2 + 32, i + 6);
+				gotoxy(j * 2 + 32, i + 8);
 				printf(FG_COLOR(0, 255, 51) "■" RESET); // 초록색, 오른쪽번개블럭
 				break;
 			case 4: // blockForm = 2
-				gotoxy(j * 2 + 32, i + 6);
+				gotoxy(j * 2 + 32, i + 8);
 				printf(FG_COLOR(255, 0, 0) "■" RESET); // 빨간색, 왼쪽번개블럭
 				break;
 			case 5: // blockForm = 3
-				gotoxy(j * 2 + 32, i + 6);
+				gotoxy(j * 2 + 32, i + 8);
 				printf(FG_COLOR(0, 255, 255) "■" RESET); // 하늘색, I자 블럭
 				break;
 			case 6: // blockForm = 4
-				gotoxy(j * 2 + 32, i + 6);
+				gotoxy(j * 2 + 32, i + 8);
 				printf(FG_COLOR(0, 102, 255) "■" RESET); // 파랑색, L자반대블럭
 				break;
 			case 7: // blockForm = 5
-				gotoxy(j * 2 + 32, i + 6);
+				gotoxy(j * 2 + 32, i + 8);
 				printf(FG_COLOR(255, 127, 0) "■" RESET); // 주황색, L자블럭
 				break;
 			case 8: // blockForm = 6
-				gotoxy(j * 2 + 32, i + 6);
+				gotoxy(j * 2 + 32, i + 8);
 				printf(FG_COLOR(255, 255, 0) "■" RESET); // 노랑색, ㅁ자블럭
 				break;
 			case 9:
-				gotoxy(j * 2 + 32, i + 6);
+				gotoxy(j * 2 + 32, i + 8);
 				printf("?");
 				break;
 			}
@@ -935,7 +1095,7 @@ void DrawBlock()
 void DropBlock() // 0.8초마다 블럭을 한칸씩 밑으로 내림
 {
 	endT = clock();
-	if ((float)(endT - startDropT) >= 800) {
+	if ((float)(endT - startDropT) >= downspeed) {
 		if (CheckCrash(x, y + 1) == true) return;
 		y++;
 		startDropT = clock();
@@ -1095,11 +1255,13 @@ void RemoveSelectedColor() {
 	gotoxy(boardWidth / 3, (boardHeight / 2) + 5); printf("▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤");
 
 	/*블럭 색상표*/
-	gotoxy((boardWidth / 2) + 11, (boardHeight / 2) + 1);
+	gotoxy((boardWidth / 2) + 9, (boardHeight / 2) + 1);
+	printf("←");
+	gotoxy((boardWidth / 2) + 13, (boardHeight / 2) + 1);
 	printf(FG_COLOR(255, 0, 255) "■   " RESET); // 보라색, T자블럭
-	gotoxy((boardWidth / 2) + 15, (boardHeight / 2) + 1);
+	gotoxy((boardWidth / 2) + 17, (boardHeight / 2) + 1);
 	printf(FG_COLOR(0, 255, 51) "■   " RESET); // 초록색, 오른쪽번개블럭
-	gotoxy((boardWidth / 2) + 19, (boardHeight / 2) + 1);
+	gotoxy((boardWidth / 2) + 21, (boardHeight / 2) + 1);
 	printf(FG_COLOR(255, 0, 0) "■   " RESET); // 빨간색, 왼쪽번개블럭
 	gotoxy((boardWidth / 2) + 9, (boardHeight / 2) + 3);
 	printf(FG_COLOR(0, 255, 255) "■   " RESET); // 하늘색, I자 블럭
@@ -1111,7 +1273,7 @@ void RemoveSelectedColor() {
 	printf(FG_COLOR(255, 255, 0) "■   " RESET); // 노랑색, ㅁ자블럭
 
 
-	gotoxy((boardWidth / 2) + 11, (boardHeight / 2) + 2);
+	gotoxy((boardWidth / 2) + 9, (boardHeight / 2) + 2);
 	printf("▲");
 
 	int return_n = 0;
@@ -1127,12 +1289,12 @@ void RemoveSelectedColor() {
 				switch (key)
 				{
 				case 77: // 오른쪽 방향키
-					if (return_n == 0 || return_n == 4 || return_n == 8) {
-						gotoxy((boardWidth / 2) + 11 + return_n, (boardHeight / 2) + 2); //원래 자리로 이동
+					if (return_n == 0 || return_n == 4 || return_n == 8 || return_n == 12) {
+						gotoxy((boardWidth / 2) + 9 + return_n, (boardHeight / 2) + 2); //원래 자리로 이동
 						printf("  "); //삭제
 						return_n += 4; //화살표의 좌표를 오른쪽으로 4변경시키고
-						if (return_n > 8) return_n = 8; //범위밖으로 나가지 못하게
-						gotoxy((boardWidth / 2) + 11 + return_n, (boardHeight / 2) + 2);
+						if (return_n > 12) return_n = 12; //범위밖으로 나가지 못하게
+						gotoxy((boardWidth / 2) + 9 + return_n, (boardHeight / 2) + 2);
 						printf("▲"); //바뀐 좌표에 방향키 출력
 						break;
 					}
@@ -1147,12 +1309,12 @@ void RemoveSelectedColor() {
 					}
 
 				case 75: //왼쪽 방향키를 누른 경우
-					if (return_n == 0 || return_n == 4 || return_n == 8) {
-						gotoxy((boardWidth / 2) + 11 + return_n, (boardHeight / 2) + 2); //원래 자리로 이동
+					if (return_n == 0 || return_n == 4 || return_n == 8 || return_n == 12) {
+						gotoxy((boardWidth / 2) + 9 + return_n, (boardHeight / 2) + 2);
 						printf("  "); //삭제
 						return_n -= 4; //화살표의 좌표를 오른쪽으로 4변경시키고
 						if (return_n < 0) return_n = 0; //범위밖으로 나가지 못하게
-						gotoxy((boardWidth / 2) + 11 + return_n, (boardHeight / 2) + 2);
+						gotoxy((boardWidth / 2) + 9 + return_n, (boardHeight / 2) + 2);
 						printf("▲"); //바뀐 좌표에 방향키 출력
 						break;
 					}
@@ -1166,8 +1328,8 @@ void RemoveSelectedColor() {
 						break;
 					}
 				case 80: //아래 방향키를 누른 경우
-					if (return_n == 0 || return_n == 4 || return_n == 8) {
-						gotoxy((boardWidth / 2) + 11 + return_n, (boardHeight / 2) + 2); //원래 자리로 이동
+					if (return_n == 0 || return_n == 4 || return_n == 8 || return_n == 12) {
+						gotoxy((boardWidth / 2) + 9 + return_n, (boardHeight / 2) + 2);
 						printf("  "); //삭제
 						return_n = 1;
 						gotoxy((boardWidth / 2) + 9, (boardHeight / 2) + 4);
@@ -1179,7 +1341,7 @@ void RemoveSelectedColor() {
 						gotoxy((boardWidth / 2) + 8 + return_n, (boardHeight / 2) + 4); //원래 자리로 이동
 						printf("  "); //삭제
 						return_n = 0;
-						gotoxy((boardWidth / 2) + 11, (boardHeight / 2) + 2);
+						gotoxy((boardWidth / 2) + 9, (boardHeight / 2) + 2);
 						printf("▲"); //바뀐 좌표에 방향키 출력
 						break;
 					}
@@ -1187,137 +1349,99 @@ void RemoveSelectedColor() {
 					break;
 				}
 			}
-			else
-				if (key == 13) return return_n; //엔터키 눌렀을 때
+			else {
+				if (key == 13) {
+					isEnter = true;
+				}
+			}
+			
+			if (isEnter == true) {
+				switch (return_n) {
+				case 4:
+					for (int i = 20; i > 0; i--) {
+						for (int j = 1; j < 11; j++) {
+							while (space[i][j] == 2) {
+								for (int k = i; k > 1; k--) {
+									space[k][j] = space[k - 1][j];
+								}
+							}
+						}
+					}
+					break;
+				case 8:
+					for (int i = 20; i > 0; i--) {
+						for (int j = 1; j < 11; j++) {
+							while (space[i][j] == 3) {
+								for (int k = i; k > 1; k--) {
+									space[k][j] = space[k - 1][j];
+								}
 
+							}
+						}
+					}
+					break;
+				case 12:
+					for (int i = 20; i > 0; i--) {
+						for (int j = 1; j < 11; j++) {
+							while (space[i][j] == 4) {
+								for (int k = i; k > 1; k--) {
+									space[k][j] = space[k - 1][j];
+								}
 
-			switch (return_n)
-			{
-			case 0:
-				for (int i = 20; i > 0; i--) {
-					for (int j = 1; j < 11; j++) {
-						if (space[i][j] == 2) {
-							while (space[i - 1][j] == 2) {
-								for (int k = i; k > 0; k--) {
-									space[k][j] = space[k - 1][j];
-								}
-								space[1][j] = 0;
 							}
-							for (int l = i; l > 0; l--) {
-								space[l][j] = space[l - 1][j];
-							}
-							space[1][j] = 0;
 						}
 					}
-				}
-				break;
-			case 4:
-				for (int i = 20; i > 0; i--) {
-					for (int j = 1; j < 11; j++) {
-						if (space[i][j] == 3) {
-							while (space[i - 1][j] == 3) {
-								for (int k = i; k > 0; k--) {
+					break;
+				case 1:
+					for (int i = 20; i > 0; i--) {
+						for (int j = 1; j < 11; j++) {
+							while (space[i][j] == 5) {
+								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
-								space[1][j] = 0;
+
 							}
-							for (int l = i; l > 0; l--) {
-								space[l][j] = space[l - 1][j];
-							}
-							space[1][j] = 0;
 						}
 					}
-				}
-				break;
-			case 8:
-				for (int i = 20; i > 0; i--) {
-					for (int j = 1; j < 11; j++) {
-						if (space[i][j] == 4) {
-							while (space[i - 1][j] == 4) {
-								for (int k = i; k > 0; k--) {
+					break;
+				case 5:
+					for (int i = 20; i > 0; i--) {
+						for (int j = 1; j < 11; j++) {
+							while (space[i][j] == 6) {
+								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
-								space[1][j] = 0;
+
 							}
-							for (int l = i; l > 0; l--) {
-								space[l][j] = space[l - 1][j];
-							}
-							space[1][j] = 0;
 						}
 					}
-				}
-				break;
-			case 1:
-				for (int i = 20; i > 0; i--) {
-					for (int j = 1; j < 11; j++) {
-						if (space[i][j] == 5) {
-							while (space[i - 1][j] == 5) {
-								for (int k = i; k > 0; k--) {
+					break;
+				case 9:
+					for (int i = 20; i > 0; i--) {
+						for (int j = 1; j < 11; j++) {
+							while (space[i][j] == 7) {
+								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
-								space[1][j] = 0;
+
 							}
-							for (int l = i; l > 0; l--) {
-								space[l][j] = space[l - 1][j];
-							}
-							space[1][j] = 0;
 						}
 					}
-				}
-				break;
-			case 5:
-				for (int i = 20; i > 0; i--) {
-					for (int j = 1; j < 11; j++) {
-						if (space[i][j] == 6) {
-							while (space[i - 1][j] == 6) {
-								for (int k = i; k > 0; k--) {
+					break;
+				case 13:
+					for (int i = 20; i > 0; i--) {
+						for (int j = 1; j < 11; j++) {
+							while (space[i][j] == 8) {
+								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
-								space[1][j] = 0;
+
 							}
-							for (int l = i; l > 0; l--) {
-								space[l][j] = space[l - 1][j];
-							}
-							space[1][j] = 0;
 						}
 					}
+					break;
 				}
-				break;
-			case 9:
-				for (int i = 20; i > 0; i--) {
-					for (int j = 1; j < 11; j++) {
-						if (space[i][j] == 7) {
-							while (space[i - 1][j] == 7) {
-								for (int k = i; k > 0; k--) {
-									space[k][j] = space[k - 1][j];
-								}
-								space[1][j] = 0;
-							}
-							for (int l = i; l > 0; l--) {
-								space[l][j] = space[l - 1][j];
-							}
-							space[1][j] = 0;
-						}
-					}
-				}
-				break;
-			case 13:
-				for (int i = 20; i > 0; i--) {
-					for (int j = 1; j < 11; j++) {
-						if (space[i][j] == 8) {
-							while (space[i - 1][j] == 8) {
-								for (int k = i; k > 0; k--) {
-									space[k][j] = space[k - 1][j];
-								}
-								space[1][j] = 0;
-							}
-							for (int l = i; l > 0; l--) {
-								space[l][j] = space[l - 1][j];
-							}
-							space[1][j] = 0;
-						}
-					}
-				}
+				isEnter = false;
 				break;
 			}
 		}
@@ -1328,7 +1452,7 @@ void Gauge(int line) // 경험치 함수 (칸 최대 16개)
 {
 	for (int j = 0; j < 10; j++) {
 		int color = space[line][j + 1] - 2;
-		if (colorGauge[color] >= 15) continue;
+		if (colorGauge[color] >= 14) continue;
 		colorGauge[color]++;
 	}
 }
