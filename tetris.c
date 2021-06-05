@@ -6,6 +6,7 @@
 #include <mmsystem.h>
 #include <stdlib.h>
 #include "cful.h"
+#define _CRT_SECURE_NO_WARNINGS
 
 #pragma comment(lib, "winmm.lib") //사운드
 
@@ -24,11 +25,15 @@ bool isHoldAlready = false;
 int holdBlockForm;
 bool isMusic = true;
 int colorGauge[7] = { 0 };
+bool isFirst = true;
 
 #define Width 90  // 창 가로 크기
 #define Height 30  // 창 세로 크기
 #define kbhit _kbhit
 #define getch _getch
+
+#define boardWidth 30
+#define boardHeight 27
 
 int block[7][4][4][4] = {  // [7]은 블럭갯수. 랜덤으로 변환, 2차원 [4]는 증감할때마다 회전
 	{ // T모양 블럭
@@ -289,6 +294,9 @@ void HoldFunction(); // 블럭 홀드 기능
 void OptionMenu(); // 옵션 메뉴
 void CheckEnding(); // 게임 종료 체크
 void Gauge(int line); // 경험치 함수
+void DeleteArea(int x1, int y1, int x2, int y2); // 범위 지정 삭제
+void RemoveSelectedLine(); // 원하는 줄 지우기
+void RemoveSelectedColor(); // 원하는 색 지우기
 
 int main() {
 	srand(time(NULL));
@@ -296,7 +304,7 @@ int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -427,8 +435,8 @@ void MenuTwo() // 조작법 메뉴
 	printf("Space : Hard Drop");
 	gotoxy(Width / 2 - 6, Height / 2 + 2);
 	printf("↑ : Rotate");
-	gotoxy(Width / 2 - 9, Height / 2 + 4);
-	printf("Shift : Hold");
+	gotoxy(Width / 2 - 5, Height / 2 + 4);
+	printf("C : Hold");
 
 	gotoxy(Width / 2 - 8, Height / 2 + 7);
 	printf("종료하시겠습니까?");
@@ -606,6 +614,16 @@ void OptionMenu() // 옵션 메뉴
 	}
 }
 
+void DeleteArea(int x1, int y1, int x2, int y2)
+{
+	for (int i = x1; i <= x2; i += 2) {
+		for (int j = y1; j <= y2; j++) {
+			gotoxy(i, j);
+			printf("  ");
+		}
+	}
+}
+
 void MenuOne() // 게임시작 메뉴
 {
 	system("cls");
@@ -628,6 +646,7 @@ void MenuOne() // 게임시작 메뉴
 }
 
 void CreateRandomForm() { // 랜덤 수 생성 (7bag 시스템 구현)
+	DeleteArea(34, 10, 42, 14);
 	isHoldAlready = false;
 	if (blockCnt < 7) {
 		blockForm = blockNum[blockCnt++];
@@ -637,7 +656,7 @@ void CreateRandomForm() { // 랜덤 수 생성 (7bag 시스템 구현)
 
 	for (int i = 0; i < 7; i++)
 		blockNum[i] = i;
-	
+
 	int i, j;
 	int n = 25; // 변경 횟수
 	while (n--) {
@@ -987,6 +1006,324 @@ void RemoveLine() {
 	}
 }
 
+void RemoveSelectedLine() {
+
+	gotoxy(boardWidth, boardHeight - 1); // boardWidth = 30, boardHeight = 27;
+	printf("◀");
+
+	int return_n = 0;
+	while (1) // 키보드 움직임
+	{
+		int key;
+		if (kbhit()) // 키보드 입력이 들어왔을 경우
+		{
+			key = getch(); // 그 키의 아스키코드값을 받아 key에 저장
+			if (key == 224 || key == 0) // 그 키가 방향키인 경우 작동
+			{
+				key = getch();
+				switch (key)
+				{
+				case 72: // 위쪽 방향키
+					if (isFirst == true) {
+						gotoxy(30, 26);
+						printf("  ");
+						return_n -= 2;
+						gotoxy(30, 25);
+						printf("◀");
+						isFirst = false;
+					}
+					else {
+						gotoxy(boardWidth, boardHeight + return_n); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n -= 1; //화살표의 좌표를 위로 3변경시키고
+						if (return_n < -(boardHeight - 8)) return_n = -(boardHeight - 8); //범위밖으로 나가지 못하게
+						gotoxy(boardWidth, boardHeight + return_n);;
+						printf("◀"); //바뀐 좌표에 방향키 출력
+					}
+					break;
+				case 80: //아래쪽 방향키를 누른 경우
+					gotoxy(boardWidth, boardHeight + return_n);; //원래 자리로 이동
+					printf("  "); //삭제
+					return_n += 1; //화살표의 좌표를 아래로 3변경시키고
+					if (return_n > -1) return_n = -1; //범위밖으로 나가지 못하게
+					gotoxy(boardWidth, boardHeight + return_n);
+					printf("◀"); //바뀐 좌표에 방향키 출력
+					break;
+				default:
+					break;
+				}
+			}
+
+			else
+				if (key == 13) //엔터키를 눌렀을 때
+				{
+					if (return_n == 0) {
+						int i = 20;
+						Gauge(i);
+						for (int j = i; j > 1; j--) {
+							for (int k = 1; k < 11; k++) {
+								space[j][k] = space[j - 1][k];
+							}
+						}
+					}
+					if (return_n < 0) {
+						int i = 21 + return_n; //return_n -1=첫줄 -19=막줄
+						Gauge(i);
+						for (int j = i; j > 1; j--) {
+							for (int k = 1; k < 11; k++) {
+								space[j][k] = space[j - 1][k];
+							}
+						}
+					}
+					isFirst = true;
+					return return_n;
+				}
+		}
+	}
+}
+
+void RemoveSelectedColor() {
+
+	gotoxy(boardWidth / 3, (boardHeight / 2) - 3); printf("▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) - 2); printf("▤                                        ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) - 1); printf("▤    ★지우고 싶은 색을 선택하세요★     ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 0); printf("▤                                        ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 1); printf("▤                                        ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 2); printf("▤                                        ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 3); printf("▤                                        ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 4); printf("▤                                        ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 5); printf("▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤");
+
+	/*블럭 색상표*/
+	gotoxy((boardWidth / 2) + 11, (boardHeight / 2) + 1);
+	printf(FG_COLOR(255, 0, 255) "■   " RESET); // 보라색, T자블럭
+	gotoxy((boardWidth / 2) + 15, (boardHeight / 2) + 1);
+	printf(FG_COLOR(0, 255, 51) "■   " RESET); // 초록색, 오른쪽번개블럭
+	gotoxy((boardWidth / 2) + 19, (boardHeight / 2) + 1);
+	printf(FG_COLOR(255, 0, 0) "■   " RESET); // 빨간색, 왼쪽번개블럭
+	gotoxy((boardWidth / 2) + 9, (boardHeight / 2) + 3);
+	printf(FG_COLOR(0, 255, 255) "■   " RESET); // 하늘색, I자 블럭
+	gotoxy((boardWidth / 2) + 13, (boardHeight / 2) + 3);
+	printf(FG_COLOR(0, 102, 255) "■   " RESET); // 파랑색, L자반대블럭
+	gotoxy((boardWidth / 2) + 17, (boardHeight / 2) + 3);
+	printf(FG_COLOR(255, 127, 0) "■   " RESET); // 주황색, L자블럭
+	gotoxy((boardWidth / 2) + 21, (boardHeight / 2) + 3);
+	printf(FG_COLOR(255, 255, 0) "■   " RESET); // 노랑색, ㅁ자블럭
+
+
+	gotoxy((boardWidth / 2) + 11, (boardHeight / 2) + 2);
+	printf("▲");
+
+	int return_n = 0;
+	while (1) // 키보드 움직임
+	{
+		int key;
+		if (kbhit()) // 키보드 입력이 들어왔을 경우
+		{
+			key = getch(); // 그 키의 아스키코드값을 받아 key에 저장
+			if (key == 224 || key == 0) // 그 키가 방향키인 경우 작동
+			{
+				key = getch();
+				switch (key)
+				{
+				case 77: // 오른쪽 방향키
+					if (return_n == 0 || return_n == 4 || return_n == 8) {
+						gotoxy((boardWidth / 2) + 11 + return_n, (boardHeight / 2) + 2); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n += 4; //화살표의 좌표를 오른쪽으로 4변경시키고
+						if (return_n > 8) return_n = 8; //범위밖으로 나가지 못하게
+						gotoxy((boardWidth / 2) + 11 + return_n, (boardHeight / 2) + 2);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+					if (return_n == 1 || return_n == 5 || return_n == 9 || return_n == 13) {
+						gotoxy((boardWidth / 2) + 8 + return_n, (boardHeight / 2) + 4); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n += 4; //화살표의 좌표를 오른쪽으로 4변경시키고
+						if (return_n > 13) return_n = 13; //범위밖으로 나가지 못하게
+						gotoxy((boardWidth / 2) + 8 + return_n, (boardHeight / 2) + 4);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+
+				case 75: //왼쪽 방향키를 누른 경우
+					if (return_n == 0 || return_n == 4 || return_n == 8) {
+						gotoxy((boardWidth / 2) + 11 + return_n, (boardHeight / 2) + 2); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n -= 4; //화살표의 좌표를 오른쪽으로 4변경시키고
+						if (return_n < 0) return_n = 0; //범위밖으로 나가지 못하게
+						gotoxy((boardWidth / 2) + 11 + return_n, (boardHeight / 2) + 2);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+					if (return_n == 1 || return_n == 5 || return_n == 9 || return_n == 13) {
+						gotoxy((boardWidth / 2) + 8 + return_n, (boardHeight / 2) + 4); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n -= 4; //화살표의 좌표를 오른쪽으로 4변경시키고
+						if (return_n < 1) return_n = 1; //범위밖으로 나가지 못하게
+						gotoxy((boardWidth / 2) + 8 + return_n, (boardHeight / 2) + 4);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+				case 80: //아래 방향키를 누른 경우
+					if (return_n == 0 || return_n == 4 || return_n == 8) {
+						gotoxy((boardWidth / 2) + 11 + return_n, (boardHeight / 2) + 2); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n = 1;
+						gotoxy((boardWidth / 2) + 9, (boardHeight / 2) + 4);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+				case 72: //위 방향키를 누른 경우
+					if (return_n == 1 || return_n == 5 || return_n == 9 || return_n == 13) {
+						gotoxy((boardWidth / 2) + 8 + return_n, (boardHeight / 2) + 4); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n = 0;
+						gotoxy((boardWidth / 2) + 11, (boardHeight / 2) + 2);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+				default:
+					break;
+				}
+			}
+			else
+				if (key == 13) return return_n; //엔터키 눌렀을 때
+
+
+			switch (return_n)
+			{
+			case 0:
+				for (int i = 20; i > 0; i--) {
+					for (int j = 1; j < 11; j++) {
+						if (space[i][j] == 2) {
+							while (space[i - 1][j] == 2) {
+								for (int k = i; k > 0; k--) {
+									space[k][j] = space[k - 1][j];
+								}
+								space[1][j] = 0;
+							}
+							for (int l = i; l > 0; l--) {
+								space[l][j] = space[l - 1][j];
+							}
+							space[1][j] = 0;
+						}
+					}
+				}
+				break;
+			case 4:
+				for (int i = 20; i > 0; i--) {
+					for (int j = 1; j < 11; j++) {
+						if (space[i][j] == 3) {
+							while (space[i - 1][j] == 3) {
+								for (int k = i; k > 0; k--) {
+									space[k][j] = space[k - 1][j];
+								}
+								space[1][j] = 0;
+							}
+							for (int l = i; l > 0; l--) {
+								space[l][j] = space[l - 1][j];
+							}
+							space[1][j] = 0;
+						}
+					}
+				}
+				break;
+			case 8:
+				for (int i = 20; i > 0; i--) {
+					for (int j = 1; j < 11; j++) {
+						if (space[i][j] == 4) {
+							while (space[i - 1][j] == 4) {
+								for (int k = i; k > 0; k--) {
+									space[k][j] = space[k - 1][j];
+								}
+								space[1][j] = 0;
+							}
+							for (int l = i; l > 0; l--) {
+								space[l][j] = space[l - 1][j];
+							}
+							space[1][j] = 0;
+						}
+					}
+				}
+				break;
+			case 1:
+				for (int i = 20; i > 0; i--) {
+					for (int j = 1; j < 11; j++) {
+						if (space[i][j] == 5) {
+							while (space[i - 1][j] == 5) {
+								for (int k = i; k > 0; k--) {
+									space[k][j] = space[k - 1][j];
+								}
+								space[1][j] = 0;
+							}
+							for (int l = i; l > 0; l--) {
+								space[l][j] = space[l - 1][j];
+							}
+							space[1][j] = 0;
+						}
+					}
+				}
+				break;
+			case 5:
+				for (int i = 20; i > 0; i--) {
+					for (int j = 1; j < 11; j++) {
+						if (space[i][j] == 6) {
+							while (space[i - 1][j] == 6) {
+								for (int k = i; k > 0; k--) {
+									space[k][j] = space[k - 1][j];
+								}
+								space[1][j] = 0;
+							}
+							for (int l = i; l > 0; l--) {
+								space[l][j] = space[l - 1][j];
+							}
+							space[1][j] = 0;
+						}
+					}
+				}
+				break;
+			case 9:
+				for (int i = 20; i > 0; i--) {
+					for (int j = 1; j < 11; j++) {
+						if (space[i][j] == 7) {
+							while (space[i - 1][j] == 7) {
+								for (int k = i; k > 0; k--) {
+									space[k][j] = space[k - 1][j];
+								}
+								space[1][j] = 0;
+							}
+							for (int l = i; l > 0; l--) {
+								space[l][j] = space[l - 1][j];
+							}
+							space[1][j] = 0;
+						}
+					}
+				}
+				break;
+			case 13:
+				for (int i = 20; i > 0; i--) {
+					for (int j = 1; j < 11; j++) {
+						if (space[i][j] == 8) {
+							while (space[i - 1][j] == 8) {
+								for (int k = i; k > 0; k--) {
+									space[k][j] = space[k - 1][j];
+								}
+								space[1][j] = 0;
+							}
+							for (int l = i; l > 0; l--) {
+								space[l][j] = space[l - 1][j];
+							}
+							space[1][j] = 0;
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+}
+
 void Gauge(int line) // 경험치 함수 (칸 최대 16개)
 {
 	for (int j = 0; j < 10; j++) {
@@ -1022,7 +1359,7 @@ void CheckEnding() {
 			printf("   ||                                    ||   \n");
 			gotoxy(Width / 2 - 22, Height / 2 + 3);
 			printf("   ======================================   \n");
-			gotoxy(Width / 2 - 22, Height / 2 + 4 );
+			gotoxy(Width / 2 - 22, Height / 2 + 4);
 			printf("                                         ");
 			gotoxy(Width / 2 - 6, Height / 2 - 2);
 			printf("게 임 종 료");
@@ -1075,6 +1412,14 @@ void InputKey() {
 			break;
 		case 27: // ESC
 			OptionMenu();
+			break;
+		case 68: // D
+		case 100: // d
+			RemoveSelectedLine();
+			break;
+		case 69: // E
+		case 101: // e
+			RemoveSelectedColor();
 			break;
 		}
 		system("cls");
