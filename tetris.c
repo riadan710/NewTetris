@@ -956,8 +956,6 @@ void DrawUI() {
 	else if (stagenum == 2) downspeed = 650;
 	else if (stagenum == 3) downspeed = 500;
 	else downspeed = 350;
-	
-	stagenum = 3;
 
 	SET_FG_COLOR(255, 51, 51);
 	gotoxy(35, 6);
