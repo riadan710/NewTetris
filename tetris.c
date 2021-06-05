@@ -12,6 +12,7 @@
 
 clock_t startDropT, endT, startGroundT;
 clock_t startSpaceT, endSpaceT;
+clock_t startItemT, endItemT;
 
 RECT blockSize;
 
@@ -24,7 +25,9 @@ int holdBlockForm;
 int colorGauge[7] = { 0 };
 int gaugelimit = 0;
 int themenum = 0;
+int stagenum = 0;
 int downspeed = 0;
+int Number_Line = 1, Number_Color = 1, Number_Speed = 1;
 
 bool isSpace = false;
 bool isHold = false;
@@ -33,6 +36,7 @@ bool isMusic = true;
 bool isFirst = true;
 bool isClear[3][5] = { false };
 bool isEnter = false;
+bool isSlowItem = false;
 
 #define Width 90  // 창 가로 크기
 #define Height 30  // 창 세로 크기
@@ -313,12 +317,13 @@ void OptionMenu(); // 옵션 메뉴
 void CheckEnding(); // 게임 종료 체크
 void Gauge(int line); // 경험치 함수
 void DeleteArea(int x1, int y1, int x2, int y2); // 범위 지정 삭제
-void RemoveSelectedLine(); // 원하는 줄 지우기
-void RemoveSelectedColor(); // 원하는 색 지우기
+void RemoveSelectedLine(); // 원하는 줄 지우기 아이템
+void RemoveSelectedColor(); // 원하는 색 지우기 아이템
 void SelectTheme(); // 테마 선택 메뉴
 void Theme1();
 void Theme2();
 void Theme3();
+void SlowFallSpeed(); // 하강 속도 일시적 감소 아이템
 
 int main() {
 	srand(time(NULL));
@@ -450,16 +455,25 @@ void MenuTwo() // 조작법 메뉴
 	DesignMainMenu();
 	gotoxy(Width / 2 - 3, Height / 2 - 6);
 	printf("조작키");
-	gotoxy(Width / 2 - 10, Height / 2 - 4);
+	gotoxy(Width / 2 - 30, Height / 2 - 4);
 	printf("←, → : Move Left, Right");
-	gotoxy(Width / 2 - 6, Height / 2 - 2);
+	gotoxy(Width / 2 - 26, Height / 2 - 2);
 	printf("↓ : Soft Drop");
-	gotoxy(Width / 2 - 9, Height / 2);
+	gotoxy(Width / 2 - 29, Height / 2);
 	printf("Space : Hard Drop");
-	gotoxy(Width / 2 - 6, Height / 2 + 2);
+	gotoxy(Width / 2 - 26, Height / 2 + 2);
 	printf("↑ : Rotate");
-	gotoxy(Width / 2 - 5, Height / 2 + 4);
+	gotoxy(Width / 2 - 25, Height / 2 + 4);
 	printf("C : Hold");
+	gotoxy(Width / 2 + 5, Height / 2 - 4);
+	printf("D : Select Line to remove");
+	gotoxy(Width / 2 + 5, Height / 2 - 2);
+	printf("E : Select Color to remove");
+	gotoxy(Width / 2 + 5, Height / 2);
+	printf("S : Decrease The Fall Speed");
+	gotoxy(Width / 2 + 5, Height / 2 + 2);
+	printf("W : Select Next Block");
+
 
 	gotoxy(Width / 2 - 8, Height / 2 + 7);
 	printf("종료하시겠습니까?");
@@ -782,6 +796,11 @@ void MenuOne() // 게임시작 메뉴
 		BlockToGround();
 		RemoveLine();
 		InputKey();
+
+		endItemT = clock();
+		if ((float)(endItemT - startItemT >= 10000)) {
+			isSlowItem = false;
+		}
 	}
 }
 
@@ -912,11 +931,11 @@ void DrawMap()
 				break;
 			case 5: // blockForm = 3
 				gotoxy(j * 2 + 6, i + 6);
-				printf(FG_COLOR(0, 255, 255) "■" RESET); // 하늘색, I자 블럭
+				printf(FG_COLOR(255, 255, 255) "■" RESET); // 하얀색, I자 블럭
 				break;
 			case 6: // blockForm = 4
 				gotoxy(j * 2 + 6, i + 6);
-				printf(FG_COLOR(0, 102, 255) "■" RESET); // 파랑색, L자반대블럭
+				printf(FG_COLOR(150, 75, 0) "■" RESET); // 갈색, L자반대블럭
 				break;
 			case 7: // blockForm = 5
 				gotoxy(j * 2 + 6, i + 6);
@@ -943,7 +962,6 @@ void DrawUI() {
 	gotoxy(39, 3);
 	printf("Pause");
 
-	int stagenum = 0;
 	for (int i = 0; i < 4; i++) {
 		if (isClear[themenum][i] == false) {
 			stagenum = i;
@@ -952,14 +970,27 @@ void DrawUI() {
 	}
 	stagenum++;
 
-	if (stagenum == 1) downspeed = 800;
-	else if (stagenum == 2) downspeed = 650;
-	else if (stagenum == 3) downspeed = 500;
-	else downspeed = 350;
+	if (isSlowItem == false) {
+		if (stagenum == 1) downspeed = 800;
+		else if (stagenum == 2) downspeed = 650;
+		else if (stagenum == 3) downspeed = 500;
+		else downspeed = 350;
+	}
+	else {
+		gotoxy(76, 22);
+		printf(FG_COLOR(255, 0, 0) "사용중" RESET);
+	}
 
 	SET_FG_COLOR(255, 51, 51);
 	gotoxy(35, 6);
 	printf("STAGE %d" RESET, stagenum);
+
+	gotoxy(50, 18);
+	printf("라인 파괴 아이템: %d 개", Number_Line);
+	gotoxy(50, 20);
+	printf("색 파괴 아이템: %d 개", Number_Color);
+	gotoxy(50, 22);
+	printf("블록 속도 아이템: %d 개", Number_Speed);
 
 	for (int i = 0; i < 22; i++) {
 		for (int j = 0; j < 20; j++) {
@@ -982,11 +1013,11 @@ void DrawUI() {
 				break;
 			case 5: // blockForm = 3
 				gotoxy(j * 2 + 32, i + 8);
-				printf(FG_COLOR(0, 255, 255) "■" RESET); // 하늘색, I자 블럭
+				printf(FG_COLOR(255, 255, 255) "■" RESET); // 하얀색, I자 블럭
 				break;
 			case 6: // blockForm = 4
 				gotoxy(j * 2 + 32, i + 8);
-				printf(FG_COLOR(0, 102, 255) "■" RESET); // 파랑색, L자반대블럭
+				printf(FG_COLOR(150, 75, 0) "■" RESET); // 갈색, L자반대블럭
 				break;
 			case 7: // blockForm = 5
 				gotoxy(j * 2 + 32, i + 8);
@@ -1027,15 +1058,15 @@ void DrawUI() {
 			break;
 		case 4:
 			gotoxy(50, j * 2);
-			printf("하늘색");
+			printf("하얀색");
 			for (int i = 0; i < colorGauge[j - 1]; i++)
-				printf(FG_COLOR(0, 255, 255) "■" RESET);
+				printf(FG_COLOR(255, 255, 255) "■" RESET);
 			break;
 		case 5:
-			gotoxy(50, j * 2);
-			printf("파랑색");
+			gotoxy(52, j * 2);
+			printf("갈색");
 			for (int i = 0; i < colorGauge[j - 1]; i++)
-				printf(FG_COLOR(0, 102, 255) "■" RESET);
+				printf(FG_COLOR(150, 75, 0) "■" RESET);
 			break;
 		case 6:
 			gotoxy(50, j * 2);
@@ -1066,10 +1097,10 @@ void DrawBlock()
 		SET_FG_COLOR(255, 0, 0); // 빨간색, 왼쪽번개블럭
 		break;
 	case 3:
-		SET_FG_COLOR(0, 255, 255); // 하늘색, I자 블럭
+		SET_FG_COLOR(255, 255, 255); // 하얀색, I자 블럭
 		break;
 	case 4:
-		SET_FG_COLOR(0, 102, 255); // 파랑색, L자반대블럭
+		SET_FG_COLOR(150, 75, 0); // 갈색, L자반대블럭
 		break;
 	case 5:
 		SET_FG_COLOR(255, 127, 0); // 주황색, L자블럭
@@ -1165,9 +1196,11 @@ void RemoveLine() {
 }
 
 void RemoveSelectedLine() {
-
 	gotoxy(boardWidth, boardHeight - 1); // boardWidth = 30, boardHeight = 27;
 	printf("◀");
+	
+	gotoxy(76, 18);
+	printf(FG_COLOR(255, 0, 0) "사용중" RESET);
 
 	int return_n = 0;
 	while (1) // 키보드 움직임
@@ -1215,6 +1248,7 @@ void RemoveSelectedLine() {
 			else
 				if (key == 13) //엔터키를 눌렀을 때
 				{
+					Number_Line = 0;
 					if (return_n == 0) {
 						int i = 20;
 						Gauge(i);
@@ -1241,6 +1275,8 @@ void RemoveSelectedLine() {
 }
 
 void RemoveSelectedColor() {
+	gotoxy(76, 20);
+	printf(FG_COLOR(255, 0, 0) "사용중" RESET);
 
 	gotoxy(boardWidth / 3, (boardHeight / 2) - 3); printf("▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤");
 	gotoxy(boardWidth / 3, (boardHeight / 2) - 2); printf("▤                                        ▤");
@@ -1262,9 +1298,9 @@ void RemoveSelectedColor() {
 	gotoxy((boardWidth / 2) + 21, (boardHeight / 2) + 1);
 	printf(FG_COLOR(255, 0, 0) "■   " RESET); // 빨간색, 왼쪽번개블럭
 	gotoxy((boardWidth / 2) + 9, (boardHeight / 2) + 3);
-	printf(FG_COLOR(0, 255, 255) "■   " RESET); // 하늘색, I자 블럭
+	printf(FG_COLOR(255, 255, 255) "■   " RESET); // 하얀색, I자 블럭
 	gotoxy((boardWidth / 2) + 13, (boardHeight / 2) + 3);
-	printf(FG_COLOR(0, 102, 255) "■   " RESET); // 파랑색, L자반대블럭
+	printf(FG_COLOR(150, 75, 0) "■   " RESET); // 갈색, L자반대블럭
 	gotoxy((boardWidth / 2) + 17, (boardHeight / 2) + 3);
 	printf(FG_COLOR(255, 127, 0) "■   " RESET); // 주황색, L자블럭
 	gotoxy((boardWidth / 2) + 21, (boardHeight / 2) + 3);
@@ -1354,11 +1390,13 @@ void RemoveSelectedColor() {
 			}
 			
 			if (isEnter == true) {
+				Number_Color = 0;
 				switch (return_n) {
 				case 4:
 					for (int i = 20; i > 0; i--) {
 						for (int j = 1; j < 11; j++) {
 							while (space[i][j] == 2) {
+								colorGauge[0]++;
 								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
@@ -1370,6 +1408,7 @@ void RemoveSelectedColor() {
 					for (int i = 20; i > 0; i--) {
 						for (int j = 1; j < 11; j++) {
 							while (space[i][j] == 3) {
+								colorGauge[1]++;
 								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
@@ -1382,6 +1421,7 @@ void RemoveSelectedColor() {
 					for (int i = 20; i > 0; i--) {
 						for (int j = 1; j < 11; j++) {
 							while (space[i][j] == 4) {
+								colorGauge[2]++;
 								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
@@ -1394,6 +1434,7 @@ void RemoveSelectedColor() {
 					for (int i = 20; i > 0; i--) {
 						for (int j = 1; j < 11; j++) {
 							while (space[i][j] == 5) {
+								colorGauge[3]++;
 								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
@@ -1406,6 +1447,7 @@ void RemoveSelectedColor() {
 					for (int i = 20; i > 0; i--) {
 						for (int j = 1; j < 11; j++) {
 							while (space[i][j] == 6) {
+								colorGauge[4]++;
 								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
@@ -1418,6 +1460,7 @@ void RemoveSelectedColor() {
 					for (int i = 20; i > 0; i--) {
 						for (int j = 1; j < 11; j++) {
 							while (space[i][j] == 7) {
+								colorGauge[5]++;
 								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
@@ -1430,6 +1473,7 @@ void RemoveSelectedColor() {
 					for (int i = 20; i > 0; i--) {
 						for (int j = 1; j < 11; j++) {
 							while (space[i][j] == 8) {
+								colorGauge[6]++;
 								for (int k = i; k > 1; k--) {
 									space[k][j] = space[k - 1][j];
 								}
@@ -1438,6 +1482,8 @@ void RemoveSelectedColor() {
 						}
 					}
 					break;
+				default:
+					Number_Color = 1;
 				}
 				isEnter = false;
 				break;
@@ -1450,7 +1496,7 @@ void Gauge(int line) // 경험치 함수 (칸 최대 16개)
 {
 	for (int j = 0; j < 10; j++) {
 		int color = space[line][j + 1] - 2;
-		if (colorGauge[color] >= 14) continue;
+		if (colorGauge[color] >= 12) continue;
 		colorGauge[color]++;
 	}
 }
@@ -1537,11 +1583,17 @@ void InputKey() {
 			break;
 		case 68: // D
 		case 100: // d
-			RemoveSelectedLine();
+			if (Number_Line == 1)
+				RemoveSelectedLine();
 			break;
 		case 69: // E
 		case 101: // e
-			RemoveSelectedColor();
+			if (Number_Color == 1)
+				RemoveSelectedColor();
+			break;
+		case 83: // S
+		case 115: // s
+			SlowFallSpeed();
 			break;
 		}
 		system("cls");
@@ -1584,10 +1636,10 @@ void ShowBlockArrivePosition() { // 블럭의 도착 추정 위치 표시
 					printf(FG_COLOR(255, 0, 0) "□" RESET); // 빨간색, 왼쪽번개블럭
 					break;
 				case 3:
-					printf(FG_COLOR(0, 255, 255) "□" RESET); // 하늘색, I자 블럭
+					printf(FG_COLOR(255, 255, 255) "□" RESET); // 하얀색, I자 블럭
 					break;
 				case 4:
-					printf(FG_COLOR(0, 102, 255) "□" RESET); // 파랑색, L자반대블럭
+					printf(FG_COLOR(150, 75, 0) "□" RESET); // 갈색, L자반대블럭
 					break;
 				case 5:
 					printf(FG_COLOR(255, 127, 0) "□" RESET); // 주황색, L자블럭
@@ -1669,4 +1721,12 @@ void HoldFunction() { // 블럭 홀드 기능
 		x = 8;
 		y = 1;
 	}
+}
+
+void SlowFallSpeed() {
+	Number_Speed = 0;
+	gotoxy(1, 1);
+	isSlowItem = true;
+	startItemT = clock();
+	downspeed = 1300;
 }
