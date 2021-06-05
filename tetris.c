@@ -1725,7 +1725,6 @@ void HoldFunction() { // 블럭 홀드 기능
 
 void SlowFallSpeed() {
 	Number_Speed = 0;
-	gotoxy(1, 1);
 	isSlowItem = true;
 	startItemT = clock();
 	downspeed = 1300;
