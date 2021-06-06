@@ -521,6 +521,7 @@ int MainMenu()
 void ShowStory() {
 	system("cls");
 	if (isShowStory == false) {
+		PlaySound(TEXT("op.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 		gotoxy(31, 5);
 		printf(FG_COLOR(255, 255, 0) "\" 요리왕이 되고 싶은 비룡 \"" RESET);
 		gotoxy(14, 9);
@@ -841,6 +842,7 @@ void SelectTheme() {
 		}
 	}
 
+	PlaySound(NULL, 0, 0);
 	system("cls");
 	MenuOne();
 }
@@ -2264,6 +2266,7 @@ void SelectBlock() {
 void CheckClear() {
 	if (isStageClear == true) {
 		PlaySound(NULL, 0, 0);
+		PlaySound(TEXT("effect.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 		system("cls");
 		if (themenum == 1) {
 			if (stagenum == 1) {
@@ -2417,6 +2420,7 @@ void CheckClear() {
 		Height = 30;
 		Console_Size();
 
+		PlaySound(NULL, 0, 0);
 		if (stagenum == 4) {
 			stagenum = 1;
 			main();
