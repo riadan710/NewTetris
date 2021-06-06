@@ -26,7 +26,7 @@ int colorGauge[7] = { 0 };
 int themenum = 0;
 int stagenum = 1;
 int downspeed = 0;
-int Number_Line = 1, Number_Color = 1, Number_Speed = 1;
+int Number_Line = 1, Number_Color = 1, Number_Speed = 1, Number_Block = 1;
 
 bool isSpace = false;
 bool isHold = false;
@@ -38,6 +38,7 @@ bool isEnter = false;
 bool isSlowItem = false;
 bool isColor[7][2] = { false };
 bool isStageClear = false;
+bool isBlock = false;
 
 #define Width 90  // 창 가로 크기
 #define Height 30  // 창 세로 크기
@@ -327,6 +328,7 @@ void Theme3();
 void SlowFallSpeed(); // 하강 속도 일시적 감소 아이템
 void DrawGauge(); // 게이즈 출력
 void CheckClear(); // 스테이지 클리어 체크
+void SelectBlock(); // 원하는 블럭 선택 아이템
 
 int main() {
 	srand(time(NULL));
@@ -1000,6 +1002,8 @@ void DrawUI() {
 	printf("색 파괴 아이템: %d 개", Number_Color);
 	gotoxy(50, 22);
 	printf("블록 속도 감소 아이템: %d 개", Number_Speed);
+	gotoxy(50, 24);
+	printf("블록 선택 아이템: %d 개", Number_Block);
 
 	for (int i = 0; i < 22; i++) {
 		for (int j = 0; j < 20; j++) {
@@ -1706,6 +1710,11 @@ void InputKey() {
 			if (Number_Speed == 1)
 				SlowFallSpeed();
 			break;
+		case 87: // W
+		case 119: // w
+			if (Number_Block == 1)
+				SelectBlock();
+			break;
 		}
 		system("cls");
 	}
@@ -1839,6 +1848,202 @@ void SlowFallSpeed() {
 	isSlowItem = true;
 	startItemT = clock();
 	downspeed = 1300;
+}
+
+void SelectBlock() {
+	DrawMap();
+	DrawUI();
+	DrawBlock();
+	ShowBlockArrivePosition();
+
+	gotoxy(75, 24);
+	printf(FG_COLOR(255, 0, 0) "사용중" RESET);
+
+	gotoxy(boardWidth / 3, (boardHeight / 2) - 3); printf("▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) - 2); printf("▤                                            ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) - 1); printf("▤       ★원하는 블록을 선택해주세요★       ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 0); printf("▤                                            ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 1); printf("▤                                            ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 2); printf("▤                                            ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 3); printf("▤                                            ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 4); printf("▤                                            ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 5); printf("▤                                            ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 6); printf("▤                                            ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 7); printf("▤                                            ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 8); printf("▤                                            ▤");
+	gotoxy(boardWidth / 3, (boardHeight / 2) + 9); printf("▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤");
+
+
+	/*블럭 선택표*/
+	gotoxy((boardWidth / 2) + 4, (boardHeight / 2) + 1);
+	printf("←");
+
+	// 보라색, T자블럭
+	gotoxy((boardWidth / 2) + 10, (boardHeight / 2) + 1);
+	printf(FG_COLOR(255, 0, 255) "■■■" RESET);
+	gotoxy((boardWidth / 2) + 10, (boardHeight / 2) + 2);
+	printf(FG_COLOR(255, 0, 255) "  ■  " RESET);
+
+	// 초록색, 오른쪽번개블럭
+	gotoxy((boardWidth / 2) + 18, (boardHeight / 2) + 1);
+	printf(FG_COLOR(0, 255, 51) "  ■■" RESET);
+	gotoxy((boardWidth / 2) + 18, (boardHeight / 2) + 2);
+	printf(FG_COLOR(0, 255, 51) "■■" RESET);
+
+	// 빨간색, 왼쪽번개블럭
+	gotoxy((boardWidth / 2) + 26, (boardHeight / 2) + 1);
+	printf(FG_COLOR(255, 0, 0) "■■" RESET);
+	gotoxy((boardWidth / 2) + 26, (boardHeight / 2) + 2);
+	printf(FG_COLOR(255, 0, 0) "  ■■" RESET);
+
+	// 하얀색, I자 블럭
+	gotoxy((boardWidth / 2) + 2, (boardHeight / 2) + 5);
+	printf(FG_COLOR(255, 255, 255) "■■■■" RESET);
+
+	// 갈색, L자반대블럭
+	gotoxy((boardWidth / 2) + 12, (boardHeight / 2) + 5);
+	printf(FG_COLOR(150, 75, 0) "■" RESET);
+	gotoxy((boardWidth / 2) + 12, (boardHeight / 2) + 6);
+	printf(FG_COLOR(150, 75, 0) "■■■" RESET);
+
+	// 주황색, L자블럭
+	gotoxy((boardWidth / 2) + 20, (boardHeight / 2) + 5);
+	printf(FG_COLOR(255, 127, 0) "    ■" RESET);
+	gotoxy((boardWidth / 2) + 20, (boardHeight / 2) + 6);
+	printf(FG_COLOR(255, 127, 0) "■■■" RESET);
+
+	// 노랑색, ㅁ자블럭
+	gotoxy((boardWidth / 2) + 28, (boardHeight / 2) + 5);
+	printf(FG_COLOR(255, 255, 0) "■■" RESET);
+	gotoxy((boardWidth / 2) + 28, (boardHeight / 2) + 6);
+	printf(FG_COLOR(255, 255, 0) "■■" RESET);
+
+	gotoxy((boardWidth / 2) + 4, (boardHeight / 2) + 3);
+	printf("▲");
+
+	int return_n = 0;
+	while (1) // 키보드 움직임
+	{
+		int key;
+		if (kbhit()) // 키보드 입력이 들어왔을 경우
+		{
+			key = getch(); // 그 키의 아스키코드값을 받아 key에 저장
+			if (key == 224 || key == 0) // 그 키가 방향키인 경우 작동
+			{
+				key = getch();
+				switch (key)
+				{
+				case 77: // 오른쪽 방향키
+					if (return_n == 0 || return_n == 8 || return_n == 16 || return_n == 24) {
+						gotoxy((boardWidth / 2) + 4 + return_n, (boardHeight / 2) + 3); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n += 8; //화살표의 좌표를 오른쪽으로 4변경시키고
+						if (return_n > 24) return_n = 24; //범위밖으로 나가지 못하게
+						gotoxy((boardWidth / 2) + 4 + return_n, (boardHeight / 2) + 3);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+					if (return_n == 1 || return_n == 9 || return_n == 17 || return_n == 25) {
+						gotoxy((boardWidth / 2) + 4 + return_n, (boardHeight / 2) + 7); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n += 8; //화살표의 좌표를 오른쪽으로 4변경시키고
+						if (return_n > 25) return_n = 25; //범위밖으로 나가지 못하게
+						gotoxy((boardWidth / 2) + 4 + return_n, (boardHeight / 2) + 7);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+
+				case 75: //왼쪽 방향키를 누른 경우
+					if (return_n == 0 || return_n == 8 || return_n == 16 || return_n == 24) {
+						gotoxy((boardWidth / 2) + 4 + return_n, (boardHeight / 2) + 3); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n -= 8; //화살표의 좌표를 오른쪽으로 4변경시키고
+						if (return_n < 0) return_n = 0; //범위밖으로 나가지 못하게
+						gotoxy((boardWidth / 2) + 4 + return_n, (boardHeight / 2) + 3);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+					if (return_n == 1 || return_n == 9 || return_n == 17 || return_n == 25) {
+						gotoxy((boardWidth / 2) + 4 + return_n, (boardHeight / 2) + 7); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n -= 8; //화살표의 좌표를 오른쪽으로 4변경시키고
+						if (return_n < 1) return_n = 1; //범위밖으로 나가지 못하게
+						gotoxy((boardWidth / 2) + 4 + return_n, (boardHeight / 2) + 7);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+				case 80: //아래 방향키를 누른 경우
+					if (return_n == 0 || return_n == 8 || return_n == 16 || return_n == 24) {
+						gotoxy((boardWidth / 2) + 4 + return_n, (boardHeight / 2) + 3); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n = 1; //화살표의 좌표를 오른쪽으로 4변경시키고
+						gotoxy((boardWidth / 2) + 5, (boardHeight / 2) + 7);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+					else
+						break;
+
+				case 72: //위 방향키를 누른 경우
+					if (return_n == 1 || return_n == 9 || return_n == 17 || return_n == 25) {
+						gotoxy((boardWidth / 2) + 4 + return_n, (boardHeight / 2) + 7); //원래 자리로 이동
+						printf("  "); //삭제
+						return_n = 0; //화살표의 좌표를 오른쪽으로 4변경시키고
+						gotoxy((boardWidth / 2) + 4, (boardHeight / 2) + 3);
+						printf("▲"); //바뀐 좌표에 방향키 출력
+						break;
+					}
+					else
+						break;
+				default:
+					break;
+				}
+			}
+			else {
+				if (key == 13) {
+					if (return_n != 0)
+						Number_Block = 0;
+					if (return_n == 0) {
+						isBlock = true;
+					}
+					else {
+						isBlock = false;
+					}
+					return return_n;
+				}
+			}
+
+			int selectForm;
+			if (return_n != 0) {
+				x = 8, y = 0;
+				switch (return_n) {
+				case 8:
+					selectForm = 0;
+					break;
+				case 16:
+					selectForm = 1;
+					break;
+				case 24:
+					selectForm = 2;
+					break;
+				case 1:
+					selectForm = 3;
+					break;
+				case 9:
+					selectForm = 4;
+					break;
+				case 17:
+					selectForm = 5;
+					break;
+				case 25:
+					selectForm = 6;
+					break;
+				}
+
+				blockForm = selectForm;
+			}
+		}
+	}
 }
 
 void CheckClear() {
