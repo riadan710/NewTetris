@@ -1934,13 +1934,6 @@ void InputKey() {
 			PlaySound(NULL, 0, 0);
 			main();
 			break;
-
-
-		// 스테이지 클리어 테스트용
-		case 65: // A
-		case 97: // a
-			isStageClear = true;
-			break;
 		}
 		system("cls");
 	}
