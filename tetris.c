@@ -327,7 +327,6 @@ void ShowBlockArrivePosition(); // 블럭의 도착 추정 위치 표시
 void DrawUI(); // Map 옆부분 UI 그리기
 void ShowNextBlock(); // 다음 블럭 표시
 void HoldFunction(); // 블럭 홀드 기능
-void OptionMenu(); // 옵션 메뉴
 void CheckEnding(); // 게임 종료 체크
 void Gauge(int line); // 경험치 함수
 void DeleteArea(int x1, int y1, int x2, int y2); // 범위 지정 삭제
@@ -346,7 +345,6 @@ int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -356,7 +354,6 @@ int main() {
 		{
 		case 0:
 			SelectTheme();
-			//MenuOne();
 			break;
 		case 3:
 			MenuTwo();
@@ -469,13 +466,13 @@ int MainMenu()
 	system("cls");
 	DesignMainMenu();
 
-	gotoxy(Width / 2 - 4, Height / 2);
+	gotoxy(Width / 2 - 5, Height / 2);
 	printf("게임 시작");
-	gotoxy(Width / 2 - 4, Height / 2 + 3);
+	gotoxy(Width / 2 - 5, Height / 2 + 3);
 	printf("조작법");
-	gotoxy(Width / 2 - 4, Height / 2 + 6);
+	gotoxy(Width / 2 - 5, Height / 2 + 6);
 	printf("제작자");
-	gotoxy(Width / 2 - 4, Height / 2 + 9);
+	gotoxy(Width / 2 - 5, Height / 2 + 9);
 	printf("게임 종료");
 	gotoxy(Width / 2 + 8, Height / 2);
 	printf("◀");
@@ -600,13 +597,13 @@ void MenuThree() // 제작자 메뉴
 {
 	system("cls");
 	DesignMainMenu();
-	gotoxy(Width / 2 - 2, Height / 2 - 6);
+	gotoxy(Width / 2 - 2, Height / 2 - 5);
 	printf("제작");
-	gotoxy(Width / 2 - 15, Height / 2 - 3);
+	gotoxy(Width / 2 - 15, Height / 2 - 2);
 	printf("중앙대학교 소프트웨어학부 21학번");
-	gotoxy(Width / 2 - 7, Height / 2);
+	gotoxy(Width / 2 - 7, Height / 2 + 1);
 	printf("김재오, 김여진");
-	gotoxy(Width / 2 - 7, Height / 2 + 2);
+	gotoxy(Width / 2 - 7, Height / 2 + 3);
 	printf("이우진, 전수빈");
 
 	gotoxy(Width / 2 - 8, Height / 2 + 7);
@@ -656,76 +653,6 @@ void MenuThree() // 제작자 메뉴
 					else
 						break;
 				}
-		}
-	}
-}
-
-void OptionMenu() // 옵션 메뉴
-{
-	system("cls");
-	gotoxy(Width / 2 - 5, Height / 2 - 12);
-	printf("옵   션");
-	gotoxy(Width / 2 - 7, Height / 2 - 4);
-	printf("배 경 음 악");
-	gotoxy(Width / 2 - 9, Height / 2 + 1);
-	printf("ON");
-	gotoxy(Width / 2 + 3, Height / 2 + 1);
-	printf("OFF");
-	gotoxy(Width / 2 + 8, Height / 2 + 1);
-	printf("◀");
-
-	gotoxy(Width / 2 - 11, Height - 3);
-	printf(FG_COLOR(255, 0, 0) "메인메뉴로 가기 : Q키" RESET);
-
-	int return_n = 13;
-	while (1) { // 키보드 움직임
-		int key;
-		if (kbhit()) {
-			key = getch();
-			if (key == 224 || key == 0) {
-				key = getch();
-				switch (key) {
-				case 75: // 왼쪽
-					gotoxy(Width / 2 - 5 + return_n, Height / 2 + 1);
-					printf("   ");
-					return_n = 0;
-					gotoxy(Width / 2 - 5, Height / 2 + 1);
-					printf("◀");
-					break;
-				case 77: // 오른쪽
-					return_n = 13;
-					gotoxy(Width / 2 + 8 - return_n, Height / 2 + 1);
-					printf("   ");
-					gotoxy(Width / 2 + 8, Height / 2 + 1);
-					printf("◀");
-					break;
-				default:
-					break;
-				}
-			}
-			else {
-				if (key == 13) // 엔터
-				{
-					if (return_n == 0) // ON
-					{
-						if (isMusic == false) PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
-						isMusic = true;
-						break;
-					}
-					else // OFF
-					{
-						PlaySound(NULL, 0, 0);
-						isMusic = false;
-						break;
-					}
-				}
-			}
-			if (key == 81 || key == 113) {
-				FirstSetting();
-				stagenum = 1;
-				main();
-				break;
-			}
 		}
 	}
 }
@@ -896,6 +823,7 @@ void DeleteArea(int x1, int y1, int x2, int y2)
 
 void MenuOne() // 게임시작 메뉴
 {
+	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	system("cls");
 	startDropT = clock();
 	endSpaceT = clock();
@@ -1076,9 +1004,6 @@ void DrawUI() {
 	gotoxy(35, 20);
 	printf("H O L D");
 
-	gotoxy(33, 1);
-	printf("ESC : Option");
-
 	if (isSlowItem == false) {
 		if (stagenum == 1) downspeed = 800;
 		else if (stagenum == 2) downspeed = 650;
@@ -1156,6 +1081,19 @@ void DrawUI() {
 		printf("블록 선택 아이템: %d 개", Number_Block);
 	}
 
+	gotoxy(50, 27);
+	printf("메인메뉴로 : ");
+	printf(FG_COLOR(255, 127, 0) "Q" RESET);
+	if (isMusic == false) {
+		gotoxy(70, 27);
+		printf("사운드 On : ");
+		printf(FG_COLOR(255, 127, 0) "M" RESET);
+	}
+	else {
+		gotoxy(69, 27);
+		printf("사운드 Off : ");
+		printf(FG_COLOR(255, 127, 0) "M" RESET);
+	}
 
 	for (int i = 0; i < 22; i++) {
 		for (int j = 0; j < 20; j++) {
@@ -1795,11 +1733,90 @@ void CheckEnding() {
 			printf("   ======================================   \n");
 			gotoxy(Width / 2 - 22, Height / 2 + 4);
 			printf("                                         ");
-			gotoxy(Width / 2 - 6, Height / 2 - 2);
+
+			gotoxy(Width / 2 - 5, Height / 2 - 4);
 			printf("게 임 종 료");
-			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-			Sleep(10000);
-			exit(0);
+			gotoxy(Width / 2 - 12, Height / 2);
+			printf("다시하기");
+			gotoxy(Width / 2 + 5, Height / 2);
+			printf("종료하기");
+			gotoxy(Width / 2 - 15, Height / 2);
+			printf("▶");
+			gotoxy(Width / 2 - 3, Height / 2);
+			printf("◀");
+			
+			int return_n = 0;
+			while (1) // 키보드 움직임
+			{
+				if (return_n == 0) {
+					gotoxy(Width / 2 - 12, Height / 2);
+					printf(FG_COLOR(255, 0, 0) "다시하기" RESET);
+					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+					gotoxy(Width / 2 + 5, Height / 2);
+					printf("종료하기");
+				}
+				else {
+					gotoxy(Width / 2 + 5, Height / 2);
+					printf(FG_COLOR(255, 0, 0) "종료하기" RESET);
+					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+					gotoxy(Width / 2 - 12, Height / 2);
+					printf("다시하기");
+				}				
+
+				int key;
+				if (kbhit()) // 키보드 입력이 들어왔을 경우
+				{
+					key = getch(); // 그 키의 아스키코드값을 받아 key에 저장
+					if (key == 224 || key == 0) // 그 키가 방향키인 경우 작동
+					{
+						key = getch();
+						switch (key)
+						{
+						case 75: // 왼쪽 방향키
+							gotoxy(Width / 2 - 15 + return_n, Height / 2);
+							printf("  ");
+							gotoxy(Width / 2 - 3 + return_n, Height / 2);
+							printf("  ");
+							return_n -= 17;
+							if (return_n < 0) return_n = 0;
+							gotoxy(Width / 2 - 15 + return_n, Height / 2);
+							printf("▶");
+							gotoxy(Width / 2 - 3 + return_n, Height / 2);
+							printf("◀");
+							break;
+						case 77: // 오른쪽 방향키
+							gotoxy(Width / 2 - 15 + return_n, Height / 2);
+							printf("  ");
+							gotoxy(Width / 2 - 3 + return_n, Height / 2);
+							printf("  ");
+							return_n += 17;
+							if (return_n > 17) return_n = 17;
+							gotoxy(Width / 2 - 15 + return_n, Height / 2);
+							printf("▶");
+							gotoxy(Width / 2 - 3 + return_n, Height / 2);
+							printf("◀");
+							break;
+						default:
+							break;
+						}
+					}
+					else
+						if (key == 13) {//엔터키를 눌렀을 때
+							if (return_n == 0)
+							{
+								FirstSetting();
+								stagenum = 1;
+								PlaySound(NULL, 0, 0);
+								SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
+								main();
+							}
+							else {
+								exit(1);
+							}
+							break;
+						}
+				}
+			}
 		}
 	}
 }
@@ -1844,9 +1861,6 @@ void InputKey() {
 		case 99: // c
 			HoldFunction();
 			break;
-		case 27: // ESC
-			OptionMenu();
-			break;
 		case 68: // D
 		case 100: // d
 			if (Number_Line == 1)
@@ -1867,8 +1881,28 @@ void InputKey() {
 			if (Number_Block == 1)
 				SelectBlock();
 			break;
-		case 65:
-		case 97:
+		case 109: // m
+			if (isMusic == false) {
+				PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+				isMusic = true;
+			}
+			else {
+				PlaySound(NULL, 0, 0);
+				isMusic = false;
+			}
+			break;
+		case 81: // Q
+		case 113: // q
+			FirstSetting();
+			stagenum = 1;
+			PlaySound(NULL, 0, 0);
+			main();
+			break;
+
+
+		// 스테이지 클리어 테스트용
+		case 65: // A
+		case 97: // a
 			isStageClear = true;
 			break;
 		}
@@ -2195,6 +2229,7 @@ void SelectBlock() {
 
 void CheckClear() {
 	if (isStageClear == true) {
+		PlaySound(NULL, 0, 0);
 		system("cls");
 		if (themenum == 1) {
 			if (stagenum == 1) {
@@ -2354,6 +2389,7 @@ void CheckClear() {
 		}
 
 		stagenum++;
+		if (isMusic == true) PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	}
 }
 
@@ -2384,7 +2420,6 @@ void FirstSetting() {
 	isSpace = false;
 	isHold = false;
 	isHoldAlready = false;
-	isMusic = true;
 	isFirst = true;
 	isEnter = false;
 	isBlock = false;
