@@ -295,6 +295,19 @@ int Themespace[10][10] = {
 	{1,1,1,1,1,1,1,1,1,1}
 };
 
+int Themespace2[10][10] = {
+	{1,1,1,1,1,1,1,1,1,1},
+	{1,0,0,0,0,0,0,0,0,1},
+	{1,0,0,2,2,2,2,0,0,1},
+	{1,0,2,2,0,0,2,2,0,1},
+	{1,0,2,0,0,0,0,2,0,1},
+	{1,0,2,0,0,0,0,2,0,1},
+	{1,0,2,2,0,0,2,2,0,1},
+	{1,0,0,2,2,2,2,0,0,1},
+	{1,0,0,0,0,0,0,0,0,1},
+	{1,1,1,1,1,1,1,1,1,1}
+};
+
 void Console_Size(); // 콘솔 사이즈 설정
 void CursorView(char show); // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 void DesignMainMenu(); // 메인 메뉴 디자인
@@ -321,9 +334,6 @@ void DeleteArea(int x1, int y1, int x2, int y2); // 범위 지정 삭제
 void RemoveSelectedLine(); // 원하는 줄 지우기 아이템
 void RemoveSelectedColor(); // 원하는 색 지우기 아이템
 void SelectTheme(); // 테마 선택 메뉴
-void Theme1();
-void Theme2();
-void Theme3();
 void SlowFallSpeed(); // 하강 속도 일시적 감소 아이템
 void DrawGauge(); // 게이즈 출력
 void CheckClear(); // 스테이지 클리어 체크
@@ -655,33 +665,83 @@ void SelectTheme() {
 	printf("테마를 선택하세요");
 	for (int i = 0; i < 10; i++) {
 		for (int j = 0; j < 10; j++) {
-			switch (Themespace[i][j]) {
-			case 1:
-				gotoxy(j * 2 + 6, i + 10);
-				if (isThemeClear[0] == false) printf("▣");
-				else printf(FG_COLOR(255, 0, 0) "▣" RESET);
-
-				gotoxy(j * 2 + 35, i + 10);
-				if (isThemeClear[1] == false) printf("▣");
-				else printf(FG_COLOR(255, 255, 0) "▣" RESET);
-
-				gotoxy(j * 2 + 64, i + 10);
-				if (isThemeClear[2] == false) printf("▣");
-				else printf(FG_COLOR(0, 102, 255) "▣" RESET);
-				break;
-			case 2:
-				gotoxy(j * 2 + 6, i + 10);
-				if (isThemeClear[0] == false) printf("■");
-				else printf(FG_COLOR(255, 0, 0) "■" RESET);
-
-				gotoxy(j * 2 + 35, i + 10);
-				if (isThemeClear[1] == false) printf("■");
-				else printf(FG_COLOR(255, 255, 0) "■" RESET);
-
-				gotoxy(j * 2 + 64, i + 10);
-				if (isThemeClear[2] == false) printf("■");
-				else printf(FG_COLOR(0, 102, 255) "■" RESET);
-				break;
+			if (isThemeClear[0] == false) {
+				switch (Themespace[i][j]) {
+				case 1:
+					gotoxy(j * 2 + 6, i + 10);
+					printf("▣");
+					break;
+				case 2:
+					gotoxy(j * 2 + 6, i + 10);
+					printf("■");
+					break;
+				}
+			}
+			else {
+				gotoxy(14, 20);
+				printf("clear");
+				switch (Themespace2[i][j]) {
+				case 1:
+					gotoxy(j * 2 + 6, i + 10);
+					printf(FG_COLOR(255, 0, 0) "▣" RESET);
+					break;
+				case 2:
+					gotoxy(j * 2 + 6, i + 10);
+					printf(FG_COLOR(255, 0, 0) "■" RESET);
+					break;
+				}
+			}
+			if (isThemeClear[1] == false) {
+				switch (Themespace[i][j]) {
+				case 1:
+					gotoxy(j * 2 + 35, i + 10);
+					printf("▣");
+					break;
+				case 2:
+					gotoxy(j * 2 + 35, i + 10);
+					printf("■");
+					break;
+				}
+			}
+			else {
+				gotoxy(43, 20);
+				printf("clear");
+				switch (Themespace2[i][j]) {
+				case 1:
+					gotoxy(j * 2 + 35, i + 10);
+					printf(FG_COLOR(255, 255, 0) "▣" RESET);
+					break;
+				case 2:
+					gotoxy(j * 2 + 35, i + 10);
+					printf(FG_COLOR(255, 255, 0) "■" RESET);
+					break;
+				}
+			}
+			if (isThemeClear[2] == false) {
+				switch (Themespace[i][j]) {
+				case 1:
+					gotoxy(j * 2 + 64, i + 10);
+					printf("▣");
+					break;
+				case 2:
+					gotoxy(j * 2 + 64, i + 10);
+					printf("■");
+					break;
+				}
+			}
+			else {
+				gotoxy(72, 20);
+				printf("clear");
+				switch (Themespace2[i][j]) {
+				case 1:
+					gotoxy(j * 2 + 64, i + 10);
+					printf(FG_COLOR(0, 255, 0) "▣" RESET);
+					break;
+				case 2:
+					gotoxy(j * 2 + 64, i + 10);
+					printf(FG_COLOR(0, 255, 0) "■" RESET);
+					break;
+				}
 			}
 		}
 	}
@@ -737,31 +797,18 @@ void SelectTheme() {
 				if (key == 13) // 엔터
 				{
 					if (return_n == 0) // 튀김류
-						Theme1();
+						themenum = 1;
 					else if (return_n == 29)
-						Theme2();
+						themenum = 2;
 					else
-						Theme3();
+						themenum = 3;
+
+					break;
 				}
 			}
 		}
 	}
-}
 
-void Theme1() {
-	themenum = 1;
-	system("cls");
-	MenuOne();
-}
-
-void Theme2() {
-	themenum = 2;
-	system("cls");
-	MenuOne();
-}
-
-void Theme3() {
-	themenum = 3;
 	system("cls");
 	MenuOne();
 }
@@ -2197,6 +2244,9 @@ void CheckClear() {
 		} //키보드 입력이 들어올 때 까지 글씨가 깜빡거림
 
 		if (stagenum == 4) {
+			Height = 60;
+			Width = 100;
+			Console_Size();
 			system("cls");
 			isThemeClear[themenum - 1] = true;
 			gotoxy(Width / 2 - 12, 2);
@@ -2204,6 +2254,8 @@ void CheckClear() {
 			else if (themenum == 2) printf(FG_COLOR(255, 255, 0) "< 밥류 >  " RESET);
 			else printf(FG_COLOR(255, 255, 0) "< 디저트류 >  " RESET);
 			printf("요리 마스터 !!");
+			dog_cook(5, 5);
+
 			while (1)
 			{
 				gotoxy(Width / 2 - 15, Height - 3);
