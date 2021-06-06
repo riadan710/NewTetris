@@ -23,9 +23,8 @@ int key;
 int blockNum[7] = { 0 }, blockCnt = 8;
 int holdBlockForm;
 int colorGauge[7] = { 0 };
-int gaugelimit = 0;
 int themenum = 0;
-int stagenum = 0;
+int stagenum = 1;
 int downspeed = 0;
 int Number_Line = 1, Number_Color = 1, Number_Speed = 1;
 
@@ -34,9 +33,11 @@ bool isHold = false;
 bool isHoldAlready = false;
 bool isMusic = true;
 bool isFirst = true;
-bool isClear[3][5] = { false };
+bool isThemeClear[3] = { false };
 bool isEnter = false;
 bool isSlowItem = false;
+bool isColor[7][2] = { false };
+bool isStageClear = false;
 
 #define Width 90  // 창 가로 크기
 #define Height 30  // 창 세로 크기
@@ -324,6 +325,8 @@ void Theme1();
 void Theme2();
 void Theme3();
 void SlowFallSpeed(); // 하강 속도 일시적 감소 아이템
+void DrawGauge(); // 게이즈 출력
+void CheckClear(); // 스테이지 클리어 체크
 
 int main() {
 	srand(time(NULL));
@@ -331,7 +334,7 @@ int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -660,28 +663,28 @@ void SelectTheme() {
 			switch (Themespace[i][j]) {
 			case 1:
 				gotoxy(j * 2 + 6, i + 10);
-				if (isClear[0][0] == false) printf("▣");
+				if (isThemeClear[0] == false) printf("▣");
 				else printf(FG_COLOR(255, 0, 0) "▣" RESET);
 
 				gotoxy(j * 2 + 35, i + 10);
-				if (isClear[1][0] == false) printf("▣");
+				if (isThemeClear[1] == false) printf("▣");
 				else printf(FG_COLOR(255, 255, 0) "▣" RESET);
 
 				gotoxy(j * 2 + 64, i + 10);
-				if (isClear[2][0] == false) printf("▣");
+				if (isThemeClear[2] == false) printf("▣");
 				else printf(FG_COLOR(0, 102, 255) "▣" RESET);
 				break;
 			case 2:
 				gotoxy(j * 2 + 6, i + 10);
-				if (isClear[0][0] == false) printf("■");
+				if (isThemeClear[0] == false) printf("■");
 				else printf(FG_COLOR(255, 0, 0) "■" RESET);
 
 				gotoxy(j * 2 + 35, i + 10);
-				if (isClear[1][0] == false) printf("■");
+				if (isThemeClear[1] == false) printf("■");
 				else printf(FG_COLOR(255, 255, 0) "■" RESET);
 
 				gotoxy(j * 2 + 64, i + 10);
-				if (isClear[2][0] == false) printf("■");
+				if (isThemeClear[2] == false) printf("■");
 				else printf(FG_COLOR(0, 102, 255) "■" RESET);
 				break;
 			}
@@ -790,6 +793,7 @@ void MenuOne() // 게임시작 메뉴
 		DrawMap();
 		ShowNextBlock();
 		DrawUI();
+		DrawGauge();
 		ShowBlockArrivePosition();
 		DrawBlock();
 		DropBlock();
@@ -801,11 +805,12 @@ void MenuOne() // 게임시작 메뉴
 		if ((float)(endItemT - startItemT >= 10000)) {
 			isSlowItem = false;
 		}
+		
+		CheckClear();
 	}
 }
 
 void CreateRandomForm() { // 랜덤 수 생성 (7bag 시스템 구현)
-	DeleteArea(34, 10, 42, 14);
 	isHoldAlready = false;
 	if (blockCnt < 7) {
 		blockForm = blockNum[blockCnt++];
@@ -837,7 +842,7 @@ void ShowNextBlock() {	// 다음 블럭 표시
 		}
 	}
 
-	if (blockCnt != 7) {
+	if (blockCnt <= 6) {
 		switch (blockNum[blockCnt]) {
 		case 0: // T자
 			UIspace[5][3] = 2;
@@ -958,17 +963,7 @@ void DrawUI() {
 	printf("H O L D");
 
 	gotoxy(33, 1);
-	printf("ESC : Option,");
-	gotoxy(39, 3);
-	printf("Pause");
-
-	for (int i = 0; i < 4; i++) {
-		if (isClear[themenum][i] == false) {
-			stagenum = i;
-			break;
-		}
-	}
-	stagenum++;
+	printf("ESC : Option");
 
 	if (isSlowItem == false) {
 		if (stagenum == 1) downspeed = 800;
@@ -979,6 +974,20 @@ void DrawUI() {
 	else {
 		gotoxy(80, 22);
 		printf(FG_COLOR(255, 0, 0) "사용중" RESET);
+	}
+
+	SET_FG_COLOR(0, 255, 255);
+	if (themenum == 1) {
+		gotoxy(35, 4);
+		printf("튀김류");
+	}
+	else if (themenum == 2) {
+		gotoxy(36, 4);
+		printf("밥류");
+	}
+	else {
+		gotoxy(34, 4);
+		printf("디저트류");
 	}
 
 	SET_FG_COLOR(255, 51, 51);
@@ -1035,51 +1044,139 @@ void DrawUI() {
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 		}
 	}
+}
 
-	for (int j = 1; j <= 7; j++) {
-		switch (j) {
-		case 1:
-			gotoxy(50, j * 2);
+void DrawGauge() {
+	if (themenum == 1) {
+		if (stagenum == 1) {
+			isColor[3][0] = true;
+			isColor[6][0] = true;
+			isColor[5][0] = true;
+			if (isColor[3][1] == true && isColor[6][1] == true && isColor[5][1] == true) {
+				isStageClear = true;
+			}
+		}
+		else if (stagenum == 2) {
+			isColor[5][0] = true;
+			isColor[3][0] = true;
+			isColor[6][0] = true;
+			isColor[2][0] = true;
+		}
+		else if (stagenum == 3) {
+			isColor[5][0] = true;
+			isColor[0][0] = true;
+			isColor[1][0] = true;
+			isColor[6][0] = true;
+			isColor[2][0] = true;
+		}
+		else {
+			isColor[5][0] = true;
+			isColor[1][0] = true;
+			isColor[0][0] = true;
+			isColor[6][0] = true;
+			isColor[2][0] = true;
+			isColor[3][0] = true;
+		}
+	}
+	else if (themenum == 2) {
+		if (stagenum == 1) {
+			isColor[3][0] = true;
+			isColor[1][0] = true;
+			isColor[5][0] = true;
+		}
+		else if (stagenum == 2) {
+			isColor[5][0] = true;
+			isColor[3][0] = true;
+			isColor[6][0] = true;
+			isColor[2][0] = true;
+		}
+		else if (stagenum == 3) {
+			isColor[3][0] = true;
+			isColor[0][0] = true;
+			isColor[5][0] = true;
+			isColor[2][0] = true;
+			isColor[4][0] = true;
+		}
+		else {
+			isColor[5][0] = true;
+			isColor[1][0] = true;
+			isColor[0][0] = true;
+			isColor[6][0] = true;
+			isColor[4][0] = true;
+			isColor[2][0] = true;
+		}
+	}
+	else {
+		if (stagenum == 1) {
+			isColor[3][0] = true;
+			isColor[4][0] = true;
+			isColor[2][0] = true;
+		}
+		else if (stagenum == 2) {
+			isColor[5][0] = true;
+			isColor[3][0] = true;
+			isColor[6][0] = true;
+			isColor[4][0] = true;
+		}
+		else if (stagenum == 3) {
+			isColor[5][0] = true;
+			isColor[6][0] = true;
+			isColor[2][0] = true;
+			isColor[1][0] = true;
+			isColor[3][0] = true;
+		}
+		else {
+			isColor[6][0] = true;
+			isColor[3][0] = true;
+			isColor[2][0] = true;
+			isColor[5][0] = true;
+			isColor[1][0] = true;
+			isColor[4][0] = true;
+		}
+	}
+
+	for (int j = 0; j < 7; j++) {
+		if (j == 0 && isColor[j][0] == true) {
+			gotoxy(50, (j + 1) * 2);
 			printf("보라색");
-			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
+			for (int i = 0; i < colorGauge[j] / 3; i++)
 				printf(FG_COLOR(255, 0, 255) "■" RESET);
-			break;
-		case 2:
-			gotoxy(50, j * 2);
+		}
+		else if (j == 1 && isColor[j][0] == true) {
+			gotoxy(50, (j + 1) * 2);
 			printf("초록색");
-			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
+			for (int i = 0; i < colorGauge[j] / 3; i++)
 				printf(FG_COLOR(0, 255, 51) "■" RESET);
-			break;
-		case 3:
-			gotoxy(50, j * 2);
+		}
+		else if (j == 2 && isColor[j][0] == true) {
+			gotoxy(50, (j + 1) * 2);
 			printf("빨강색");
-			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
+			for (int i = 0; i < colorGauge[j] / 3; i++)
 				printf(FG_COLOR(255, 0, 0) "■" RESET);
-			break;
-		case 4:
-			gotoxy(50, j * 2);
+		}
+		else if (j == 3 && isColor[j][0] == true) {
+			gotoxy(50, (j + 1) * 2);
 			printf("하얀색");
-			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
+			for (int i = 0; i < colorGauge[j] / 3; i++)
 				printf(FG_COLOR(255, 255, 255) "■" RESET);
-			break;
-		case 5:
-			gotoxy(52, j * 2);
+		}
+		else if (j == 4 && isColor[j][0] == true) {
+			gotoxy(52, (j + 1) * 2);
 			printf("갈색");
-			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
+			for (int i = 0; i < colorGauge[j] / 3; i++)
 				printf(FG_COLOR(150, 75, 0) "■" RESET);
-			break;
-		case 6:
-			gotoxy(50, j * 2);
+		}
+		else if (j == 5 && isColor[j][0] == true) {
+			gotoxy(50, (j + 1) * 2);
 			printf("주황색");
-			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
+			for (int i = 0; i < colorGauge[j] / 3; i++)
 				printf(FG_COLOR(255, 127, 0) "■" RESET);
-			break;
-		case 7:
-			gotoxy(50, j * 2);
+		}
+		else if (j == 6 && isColor[j][0] == true) {
+			gotoxy(50, (j + 1) * 2);
 			printf("노랑색");
-			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
+			for (int i = 0; i < colorGauge[j] / 3; i++)
 				printf(FG_COLOR(255, 255, 0) "■" RESET);
-			break;
 		}
 	}
 }
@@ -1506,7 +1603,10 @@ void Gauge(int line) // 경험치 함수 (칸 최대 16개)
 {
 	for (int j = 0; j < 10; j++) {
 		int color = space[line][j + 1] - 2;
-		if (colorGauge[color] >= 36) continue;
+		if (colorGauge[color] >= 36) {
+			isColor[color][1] = true;
+			continue;
+		}
 		colorGauge[color]++;
 	}
 }
@@ -1603,7 +1703,8 @@ void InputKey() {
 			break;
 		case 83: // S
 		case 115: // s
-			SlowFallSpeed();
+			if (Number_Speed == 1)
+				SlowFallSpeed();
 			break;
 		}
 		system("cls");
@@ -1738,4 +1839,49 @@ void SlowFallSpeed() {
 	isSlowItem = true;
 	startItemT = clock();
 	downspeed = 1300;
+}
+
+void CheckClear() {
+	if (isStageClear == true) {
+		for (int i = 0; i < 22; i++) {
+			for (int j = 0; j < 12; j++) {
+				if (i == 0 || i == 21) space[i][j] = 1;
+				else if (j == 0 || j == 11) space[i][j] = 1;
+				else space[i][j] = 0;
+			}
+		}
+
+		for (int i = 0; i < 22; i++) {
+			for (int j = 0; j < 20; j++) {
+				if ((i == 3 || i == 8 || i == 14 || i == 19) && j >= 0 && j <= 6) UIspace[i][j] = 1;
+				else if ((i >= 4 && i <= 7 && (j == 0 || j == 6)) || (i >= 15 && i <= 18 && (j == 0 || j == 6))) UIspace[i][j] = 1;
+				else UIspace[i][j] = 0;
+			}
+		}
+
+		isStageClear = false;
+		stagenum++;
+		Number_Line = 1, Number_Color = 1, Number_Speed = 1;
+		blockCnt = 8;
+		CreateRandomForm();
+		x = 8, y = 0;
+		for (int i = 0; i < 6; i++) colorGauge[i] = 0;
+
+		isSpace = false;
+		isHold = false;
+		isHoldAlready = false;
+		isMusic = true;
+		isFirst = true;
+		isEnter = false;
+		isSlowItem = false;
+		for (int i = 0; i < 6; i++) {
+			isColor[i][0] = false;
+			isColor[i][1] = false;
+		}
+
+		if (stagenum >= 5) {
+			isThemeClear[themenum - 1] = true;
+			stagenum = 1;
+		}
+	}
 }
