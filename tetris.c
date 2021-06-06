@@ -977,7 +977,7 @@ void DrawUI() {
 		else downspeed = 350;
 	}
 	else {
-		gotoxy(76, 22);
+		gotoxy(80, 22);
 		printf(FG_COLOR(255, 0, 0) "사용중" RESET);
 	}
 
@@ -990,7 +990,7 @@ void DrawUI() {
 	gotoxy(50, 20);
 	printf("색 파괴 아이템: %d 개", Number_Color);
 	gotoxy(50, 22);
-	printf("블록 속도 아이템: %d 개", Number_Speed);
+	printf("블록 속도 감소 아이템: %d 개", Number_Speed);
 
 	for (int i = 0; i < 22; i++) {
 		for (int j = 0; j < 20; j++) {
@@ -1041,43 +1041,43 @@ void DrawUI() {
 		case 1:
 			gotoxy(50, j * 2);
 			printf("보라색");
-			for (int i = 0; i < colorGauge[j - 1]; i++)
+			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
 				printf(FG_COLOR(255, 0, 255) "■" RESET);
 			break;
 		case 2:
 			gotoxy(50, j * 2);
 			printf("초록색");
-			for (int i = 0; i < colorGauge[j - 1]; i++)
+			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
 				printf(FG_COLOR(0, 255, 51) "■" RESET);
 			break;
 		case 3:
 			gotoxy(50, j * 2);
 			printf("빨강색");
-			for (int i = 0; i < colorGauge[j - 1]; i++)
+			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
 				printf(FG_COLOR(255, 0, 0) "■" RESET);
 			break;
 		case 4:
 			gotoxy(50, j * 2);
 			printf("하얀색");
-			for (int i = 0; i < colorGauge[j - 1]; i++)
+			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
 				printf(FG_COLOR(255, 255, 255) "■" RESET);
 			break;
 		case 5:
 			gotoxy(52, j * 2);
 			printf("갈색");
-			for (int i = 0; i < colorGauge[j - 1]; i++)
+			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
 				printf(FG_COLOR(150, 75, 0) "■" RESET);
 			break;
 		case 6:
 			gotoxy(50, j * 2);
 			printf("주황색");
-			for (int i = 0; i < colorGauge[j - 1]; i++)
+			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
 				printf(FG_COLOR(255, 127, 0) "■" RESET);
 			break;
 		case 7:
 			gotoxy(50, j * 2);
 			printf("노랑색");
-			for (int i = 0; i < colorGauge[j - 1]; i++)
+			for (int i = 0; i < colorGauge[j - 1] / 3; i++)
 				printf(FG_COLOR(255, 255, 0) "■" RESET);
 			break;
 		}
@@ -1196,6 +1196,11 @@ void RemoveLine() {
 }
 
 void RemoveSelectedLine() {
+	DrawMap();
+	DrawUI();
+	DrawBlock();
+	ShowBlockArrivePosition();
+
 	gotoxy(boardWidth, boardHeight - 1); // boardWidth = 30, boardHeight = 27;
 	printf("◀");
 	
@@ -1275,6 +1280,11 @@ void RemoveSelectedLine() {
 }
 
 void RemoveSelectedColor() {
+	DrawMap();
+	DrawUI();
+	DrawBlock();
+	ShowBlockArrivePosition();
+
 	gotoxy(76, 20);
 	printf(FG_COLOR(255, 0, 0) "사용중" RESET);
 
@@ -1496,7 +1506,7 @@ void Gauge(int line) // 경험치 함수 (칸 최대 16개)
 {
 	for (int j = 0; j < 10; j++) {
 		int color = space[line][j + 1] - 2;
-		if (colorGauge[color] >= 12) continue;
+		if (colorGauge[color] >= 36) continue;
 		colorGauge[color]++;
 	}
 }
