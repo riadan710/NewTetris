@@ -2185,13 +2185,39 @@ void CheckClear() {
 		while (1)
 		{
 			gotoxy(Width / 2 - 19, Height - 3);
-			printf("다음 스테이지로 가려면 아무키나 누르세요!");
+			printf("다음 스테이지로 가려면 엔터키를 누르세요!");
 			Sleep(500);
-			if (kbhit()) break;
+			if (kbhit()) {
+				key = getch();
+				if (key == 13) break;
+			}
 			gotoxy(Width / 2 - 19, Height - 3);
 			printf("                                             ");
 			Sleep(500);
 		} //키보드 입력이 들어올 때 까지 글씨가 깜빡거림
+
+		if (stagenum == 4) {
+			system("cls");
+			isThemeClear[themenum - 1] = true;
+			gotoxy(Width / 2 - 12, 2);
+			if (themenum == 1) printf(FG_COLOR(255, 255, 0) "< 튀김류 >  " RESET);
+			else if (themenum == 2) printf(FG_COLOR(255, 255, 0) "< 밥류 >  " RESET);
+			else printf(FG_COLOR(255, 255, 0) "< 디저트류 >  " RESET);
+			printf("요리 마스터 !!");
+			while (1)
+			{
+				gotoxy(Width / 2 - 15, Height - 3);
+				printf("계속하려면 스페이스바를 누르세요!");
+				Sleep(500);
+				if (kbhit()) {
+					key = getch();
+					if (key == 32) break;
+				}
+				gotoxy(Width / 2 - 15, Height - 3);
+				printf("                                   ");
+				Sleep(500);
+			} //키보드 입력이 들어올 때 까지 글씨가 깜빡거림
+		}
 
 		for (int i = 0; i < 22; i++) {
 			for (int j = 0; j < 12; j++) {
@@ -2227,16 +2253,17 @@ void CheckClear() {
 		for (int i = 0; i < 7; i++) {
 			isColor[i][0] = false;
 			isColor[i][1] = false;
-		}
-
-		stagenum++;
-		if (stagenum >= 5) {
-			isThemeClear[themenum - 1] = true;
-			stagenum = 1;
-		}
+		}		
 
 		Width = 90;
 		Height = 30;
 		Console_Size();
+
+		if (stagenum == 4) {
+			stagenum = 1;
+			main();
+		}
+
+		stagenum++;
 	}
 }
