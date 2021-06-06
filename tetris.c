@@ -974,7 +974,7 @@ void DrawUI() {
 		else downspeed = 350;
 	}
 	else {
-		gotoxy(80, 22);
+		gotoxy(81, 22);
 		printf(FG_COLOR(255, 0, 0) "사용중" RESET);
 	}
 
@@ -997,12 +997,16 @@ void DrawUI() {
 	printf("STAGE %d" RESET, stagenum);
 
 	gotoxy(50, 18);
+	printf(FG_COLOR(255, 255, 0) "D " RESET);
 	printf("라인 파괴 아이템: %d 개", Number_Line);
 	gotoxy(50, 20);
+	printf(FG_COLOR(255, 255, 0) "E " RESET);
 	printf("색 파괴 아이템: %d 개", Number_Color);
 	gotoxy(50, 22);
+	printf(FG_COLOR(255, 255, 0) "S " RESET);
 	printf("블록 속도 감소 아이템: %d 개", Number_Speed);
 	gotoxy(50, 24);
+	printf(FG_COLOR(255, 255, 0) "W " RESET);
 	printf("블록 선택 아이템: %d 개", Number_Block);
 
 	for (int i = 0; i < 22; i++) {
@@ -1305,7 +1309,7 @@ void RemoveSelectedLine() {
 	gotoxy(boardWidth, boardHeight - 1); // boardWidth = 30, boardHeight = 27;
 	printf("◀");
 	
-	gotoxy(76, 18);
+	gotoxy(81, 18);
 	printf(FG_COLOR(255, 0, 0) "사용중" RESET);
 
 	int return_n = 0;
@@ -1386,7 +1390,7 @@ void RemoveSelectedColor() {
 	DrawBlock();
 	ShowBlockArrivePosition();
 
-	gotoxy(76, 20);
+	gotoxy(81, 20);
 	printf(FG_COLOR(255, 0, 0) "사용중" RESET);
 
 	gotoxy(boardWidth / 3, (boardHeight / 2) - 3); printf("▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤");
@@ -1856,7 +1860,7 @@ void SelectBlock() {
 	DrawBlock();
 	ShowBlockArrivePosition();
 
-	gotoxy(75, 24);
+	gotoxy(81, 24);
 	printf(FG_COLOR(255, 0, 0) "사용중" RESET);
 
 	gotoxy(boardWidth / 3, (boardHeight / 2) - 3); printf("▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤");
