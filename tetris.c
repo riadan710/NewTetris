@@ -6,9 +6,15 @@
 #include <mmsystem.h>
 #include <stdlib.h>
 #include "cful.h"
+#include "food.h"
 #define _CRT_SECURE_NO_WARNINGS
 
 #pragma comment(lib, "winmm.lib") //사운드
+
+#define kbhit _kbhit
+#define getch _getch
+#define boardWidth 30
+#define boardHeight 27
 
 clock_t startDropT, endT, startGroundT;
 clock_t startSpaceT, endSpaceT;
@@ -16,6 +22,7 @@ clock_t startItemT, endItemT;
 
 RECT blockSize;
 
+int Width = 90, Height = 30; // 창 가로, 세로 길이
 int x = 8, y = 0;
 int blockForm;
 int blockRotation = 0;
@@ -39,13 +46,6 @@ bool isSlowItem = false;
 bool isColor[7][2] = { false };
 bool isStageClear = false;
 bool isBlock = false;
-
-#define Width 90  // 창 가로 크기
-#define Height 30  // 창 세로 크기
-#define kbhit _kbhit
-#define getch _getch
-#define boardWidth 30
-#define boardHeight 27
 
 int block[7][4][4][4] = {  // [7]은 블럭갯수. 랜덤으로 변환, 2차원 [4]는 증감할때마다 회전
 	{ // T모양 블럭
@@ -297,7 +297,6 @@ int Themespace[10][10] = {
 
 void Console_Size(); // 콘솔 사이즈 설정
 void CursorView(char show); // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
-void gotoxy(int x, int y); //커서 이동 함수
 void DesignMainMenu(); // 메인 메뉴 디자인
 int MainMenu(); // 메인 메뉴
 void MenuTwo(); // 조작법 메뉴
@@ -336,7 +335,7 @@ int main() {
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
@@ -360,12 +359,6 @@ int main() {
 	}
 
 	return 0;
-}
-
-void gotoxy(int x, int y) //커서 이동 함수
-{
-	COORD pos = { x,y };
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
 void Console_Size() // 콘솔 사이즈 설정
@@ -902,12 +895,13 @@ void ShowNextBlock() {	// 다음 블럭 표시
 
 void DrawMap()
 {
-	gotoxy(11, 1);
+	gotoxy(10, 1);
 	printf(FG_COLOR(255, 0, 0) "요 " RESET);
 	printf(FG_COLOR(255, 127, 0) "리 " RESET);
 	printf(FG_COLOR(255, 255, 0) "왕 " RESET);
 	printf(FG_COLOR(0, 255, 0) "비 " RESET);
-	printf(FG_COLOR(0, 255, 255) "룡" RESET);
+	printf(FG_COLOR(0, 255, 255) "룡 " RESET);
+	printf(FG_COLOR(148, 0, 211) "★" RESET);
 	gotoxy(12, 4);
 	printf(FG_COLOR(255, 0, 0) "T " RESET);
 	printf(FG_COLOR(255, 127, 0) "E " RESET);
@@ -996,18 +990,54 @@ void DrawUI() {
 	gotoxy(35, 6);
 	printf("STAGE %d" RESET, stagenum);
 
-	gotoxy(50, 18);
-	printf(FG_COLOR(255, 255, 0) "D " RESET);
-	printf("라인 파괴 아이템: %d 개", Number_Line);
-	gotoxy(50, 20);
-	printf(FG_COLOR(255, 255, 0) "E " RESET);
-	printf("색 파괴 아이템: %d 개", Number_Color);
-	gotoxy(50, 22);
-	printf(FG_COLOR(255, 255, 0) "S " RESET);
-	printf("블록 속도 감소 아이템: %d 개", Number_Speed);
-	gotoxy(50, 24);
-	printf(FG_COLOR(255, 255, 0) "W " RESET);
-	printf("블록 선택 아이템: %d 개", Number_Block);
+	if (Number_Line == 1) {
+		gotoxy(50, 18);
+		printf(FG_COLOR(255, 255, 0) "D " RESET);
+		printf("라인 파괴 아이템: %d 개", Number_Line);
+	}
+	else {
+		gotoxy(50, 18);
+		printf(FG_COLOR(82, 69, 16) "D " RESET);
+		SET_FG_COLOR(98, 98, 98);
+		printf("라인 파괴 아이템: %d 개", Number_Line);
+	}
+
+	if (Number_Color == 1) {
+		gotoxy(50, 20);
+		printf(FG_COLOR(255, 255, 0) "E " RESET);
+		printf("색 파괴 아이템: %d 개", Number_Color);
+	}
+	else {
+		gotoxy(50, 20);
+		printf(FG_COLOR(82, 69, 16) "E " RESET);
+		SET_FG_COLOR(98, 98, 98);
+		printf("색 파괴 아이템: %d 개", Number_Color);
+	}
+
+	if (Number_Speed == 1) {
+		gotoxy(50, 22);
+		printf(FG_COLOR(255, 255, 0) "S " RESET);
+		printf("블록 속도 감소 아이템: %d 개", Number_Speed);
+	}
+	else {
+		gotoxy(50, 22);
+		printf(FG_COLOR(82, 69, 16) "S " RESET);
+		SET_FG_COLOR(98, 98, 98);
+		printf("블록 속도 감소 아이템: %d 개", Number_Speed);
+	}
+
+	if (Number_Block == 1) {
+		gotoxy(50, 24);
+		printf(FG_COLOR(255, 255, 0) "W " RESET);
+		printf("블록 선택 아이템: %d 개", Number_Block);
+	}
+	else {
+		gotoxy(50, 24);
+		printf(FG_COLOR(82, 69, 16) "W " RESET);
+		SET_FG_COLOR(98, 98, 98);
+		printf("블록 선택 아이템: %d 개", Number_Block);
+	}
+
 
 	for (int i = 0; i < 22; i++) {
 		for (int j = 0; j < 20; j++) {
@@ -1378,7 +1408,7 @@ void RemoveSelectedLine() {
 						}
 					}
 					isFirst = true;
-					return return_n;
+					break;
 				}
 		}
 	}
@@ -1719,6 +1749,10 @@ void InputKey() {
 			if (Number_Block == 1)
 				SelectBlock();
 			break;
+		case 65:
+		case 97:
+			isStageClear = true;
+			break;
 		}
 		system("cls");
 	}
@@ -2005,46 +2039,37 @@ void SelectBlock() {
 			}
 			else {
 				if (key == 13) {
-					if (return_n != 0)
-						Number_Block = 0;
-					if (return_n == 0) {
-						isBlock = true;
-					}
-					else {
-						isBlock = false;
-					}
-					return return_n;
+					isBlock = true;
 				}
+				break;
 			}
 
-			int selectForm;
-			if (return_n != 0) {
+			if (isBlock == true) {
+				Number_Block = 0;
 				x = 8, y = 0;
 				switch (return_n) {
 				case 8:
-					selectForm = 0;
+					blockForm = 0;
 					break;
 				case 16:
-					selectForm = 1;
+					blockForm = 1;
 					break;
 				case 24:
-					selectForm = 2;
+					blockForm = 2;
 					break;
 				case 1:
-					selectForm = 3;
+					blockForm = 3;
 					break;
 				case 9:
-					selectForm = 4;
+					blockForm = 4;
 					break;
 				case 17:
-					selectForm = 5;
+					blockForm = 5;
 					break;
 				case 25:
-					selectForm = 6;
+					blockForm = 6;
 					break;
 				}
-
-				blockForm = selectForm;
 			}
 		}
 	}
@@ -2052,6 +2077,122 @@ void SelectBlock() {
 
 void CheckClear() {
 	if (isStageClear == true) {
+		system("cls");
+		if (themenum == 1) {
+			if (stagenum == 1) {
+				Height = 35;
+				Console_Size();
+				gotoxy(Width / 2 - 12, 2);
+				printf(FG_COLOR(255, 255, 0) "< 도너츠 >  " RESET);
+				printf("조리법 획득 !!");
+				doughnut(20, 5);
+			}
+			else if (stagenum == 2) {
+				Height = 37;
+				Console_Size();
+				gotoxy(Width / 2 - 11, 2);
+				printf(FG_COLOR(255, 255, 0) "< 치킨 >  " RESET);
+				printf("조리법 획득 !!");
+				chicken(8, 5);
+			}
+			else if (stagenum == 3) {
+				Height = 42;
+				Console_Size();
+				gotoxy(Width / 2 - 12, 2);
+				printf(FG_COLOR(255, 255, 0) "< 핫도그 >  " RESET);
+				printf("조리법 획득 !!");
+				hot_dog(12, 5);
+			}
+			else {
+				Height = 39;
+				Console_Size();
+				gotoxy(Width / 2 - 12, 2);
+				printf(FG_COLOR(255, 255, 0) "< 토스트 >  " RESET);
+				printf("조리법 획득 !!");
+				toast(16, 5);
+			}
+		}
+		else if (themenum == 2) {
+			if (stagenum == 1) {
+				Height = 30;
+				Console_Size();
+				gotoxy(Width / 2 - 13, 2);
+				printf(FG_COLOR(255, 255, 0) "< 새우초밥 >  " RESET);
+				printf("조리법 획득 !!");
+				shrimp_sushi(14, 5);
+			}
+			else if (stagenum == 2) {
+				Height = 41;
+				Console_Size();
+				gotoxy(Width / 2 - 13, 2);
+				printf(FG_COLOR(255, 255, 0) "< 팬케이크 >  " RESET);
+				printf("조리법 획득 !!");
+				pancake(10, 5);
+			}
+			else if (stagenum == 3) {
+				Height = 30;
+				Console_Size();
+				gotoxy(Width / 2 - 12, 2);
+				printf(FG_COLOR(255, 255, 0) "< 주먹밥 >  " RESET);
+				printf("조리법 획득 !!");
+				rice_ball(14, 7);
+			}
+			else {
+				Height = 30;
+				Console_Size();
+				gotoxy(Width / 2 - 12, 2);
+				printf(FG_COLOR(255, 255, 0) "< 햄버거 >  " RESET);
+				printf("조리법 획득 !!");
+				hamburger(28, 5);
+			}
+		}
+		else {
+			if (stagenum == 1) {
+				Height = 50;
+				Console_Size();
+				gotoxy(Width / 2 - 11, 2);
+				printf(FG_COLOR(255, 255, 0) "< 사탕 >  " RESET);
+				printf("조리법 획득 !!");
+				candy(24, 5);
+			}
+			else if (stagenum == 2) {
+				Height = 32;
+				Console_Size();
+				gotoxy(Width / 2 - 14, 2);
+				printf(FG_COLOR(255, 255, 0) "< 아이스크림 >  " RESET);
+				printf("조리법 획득 !!");
+				Ice_cream(33, 5);
+			}
+			else if (stagenum == 3) {
+				Height = 32;
+				Console_Size();
+				gotoxy(Width / 2 - 12, 2);
+				printf(FG_COLOR(255, 255, 0) "< 마카롱 >  " RESET);
+				printf("조리법 획득 !!");
+				macaroon(20, 5);
+			}
+			else {
+				Height = 60;
+				Width = 110;
+				Console_Size();
+				gotoxy(Width / 2 - 12, 2);
+				printf(FG_COLOR(255, 255, 0) "< 케이크 >  " RESET);
+				printf("조리법 획득 !!");
+				cake(3, 4);
+			}
+		}
+
+		while (1)
+		{
+			gotoxy(Width / 2 - 19, Height - 3);
+			printf("다음 스테이지로 가려면 아무키나 누르세요!");
+			Sleep(500);
+			if (kbhit()) break;
+			gotoxy(Width / 2 - 19, Height - 3);
+			printf("                                             ");
+			Sleep(500);
+		} //키보드 입력이 들어올 때 까지 글씨가 깜빡거림
+
 		for (int i = 0; i < 22; i++) {
 			for (int j = 0; j < 12; j++) {
 				if (i == 0 || i == 21) space[i][j] = 1;
@@ -2069,12 +2210,11 @@ void CheckClear() {
 		}
 
 		isStageClear = false;
-		stagenum++;
-		Number_Line = 1, Number_Color = 1, Number_Speed = 1;
+		Number_Line = 1, Number_Color = 1, Number_Speed = 1, Number_Block = 1;
 		blockCnt = 8;
 		CreateRandomForm();
 		x = 8, y = 0;
-		for (int i = 0; i < 6; i++) colorGauge[i] = 0;
+		for (int i = 0; i < 7; i++) colorGauge[i] = 0;
 
 		isSpace = false;
 		isHold = false;
@@ -2082,15 +2222,21 @@ void CheckClear() {
 		isMusic = true;
 		isFirst = true;
 		isEnter = false;
+		isBlock = false;
 		isSlowItem = false;
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 7; i++) {
 			isColor[i][0] = false;
 			isColor[i][1] = false;
 		}
 
+		stagenum++;
 		if (stagenum >= 5) {
 			isThemeClear[themenum - 1] = true;
 			stagenum = 1;
 		}
+
+		Width = 90;
+		Height = 30;
+		Console_Size();
 	}
 }

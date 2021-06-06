@@ -23,5 +23,8 @@
     <ClInclude Include="cful.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
+    <ClInclude Include="food.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
