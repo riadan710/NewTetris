@@ -342,11 +342,11 @@ void FirstSetting(); // 초기 세팅
 
 int main() {
 	srand(time(NULL));
-	SetConsoleTitle(TEXT("NEW TETRIS"));
+	SetConsoleTitle(TEXT("NEW TETRIS : 요리왕 비룡"));
 	CursorView(0);  // 커서 깜빡임 숨기기. 0이면 숨김, 1이면 보임
 	Console_Size(); // 콘솔 사이즈 설정
 	DesignMainMenu(); // 메인메뉴 디자인 출력
-	//PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
+	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // 배경음악 재생
 
 	while (1) // 게임 메뉴 선택
 	{
