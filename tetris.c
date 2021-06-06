@@ -338,6 +338,7 @@ void SlowFallSpeed(); // 하강 속도 일시적 감소 아이템
 void DrawGauge(); // 게이즈 출력
 void CheckClear(); // 스테이지 클리어 체크
 void SelectBlock(); // 원하는 블럭 선택 아이템
+void FirstSetting(); // 초기 세팅
 
 int main() {
 	srand(time(NULL));
@@ -394,11 +395,72 @@ void CursorView(char show)  // 커서 깜빡임 숨기기. 0이면 숨김, 1이�
 void DesignMainMenu() // 메인 메뉴 디자인
 {
 	printf("\n\n");
-	printf("         ■■■■■   ■■■   ■■■■■   ■■■■      ■■■■■     ■■■■  \n");
-	printf("             ■       ■           ■       ■      ■        ■        ■         \n");
-	printf("             ■       ■■■       ■       ■■■■          ■         ■■■■  \n");
-	printf("             ■       ■           ■       ■     ■         ■                ■  \n");
-	printf("             ■       ■■■       ■       ■      ■    ■■■■■     ■■■■  \n");
+	gotoxy(9, 3);
+	printf(FG_COLOR(255, 0, 0) "■■■■■" RESET);
+	gotoxy(13, 4);
+	printf(FG_COLOR(255, 0, 0) "■" RESET);
+	gotoxy(13, 5);
+	printf(FG_COLOR(255, 0, 0) "■" RESET);
+	gotoxy(13, 6);
+	printf(FG_COLOR(255, 0, 0) "■" RESET);
+	gotoxy(13, 7);
+	printf(FG_COLOR(255, 0, 0) "■" RESET);
+
+	gotoxy(22, 3);
+	printf(FG_COLOR(255, 127, 0) "■■■" RESET);
+	gotoxy(22, 4);
+	printf(FG_COLOR(255, 127, 0) "■" RESET);
+	gotoxy(22, 5);
+	printf(FG_COLOR(255, 127, 0) "■■■" RESET);
+	gotoxy(22, 6);
+	printf(FG_COLOR(255, 127, 0) "■" RESET);
+	gotoxy(22, 7);
+	printf(FG_COLOR(255, 127, 0) "■■■" RESET);
+
+	gotoxy(32, 3);
+	printf(FG_COLOR(255, 255, 0) "■■■■■" RESET);
+	gotoxy(36, 4);
+	printf(FG_COLOR(255, 255, 0) "■" RESET);
+	gotoxy(36, 5);
+	printf(FG_COLOR(255, 255, 0) "■" RESET);
+	gotoxy(36, 6);
+	printf(FG_COLOR(255, 255, 0) "■" RESET);
+	gotoxy(36, 7);
+	printf(FG_COLOR(255, 255, 0) "■" RESET);
+
+	gotoxy(45, 3);
+	printf(FG_COLOR(0, 255, 0) "■■■■" RESET);
+	gotoxy(45, 4);
+	printf(FG_COLOR(0, 255, 0) "■      ■" RESET);
+	gotoxy(45, 5);
+	printf(FG_COLOR(0, 255, 0) "■■■■" RESET);
+	gotoxy(45, 6);
+	printf(FG_COLOR(0, 255, 0) "■     ■" RESET);
+	gotoxy(45, 7);
+	printf(FG_COLOR(0, 255, 0) "■      ■" RESET);
+
+	gotoxy(58, 3);
+	printf(FG_COLOR(0, 255, 255) "■■■■■" RESET);
+	gotoxy(62, 4);
+	printf(FG_COLOR(0, 255, 255) "■" RESET);
+	gotoxy(62, 5);
+	printf(FG_COLOR(0, 255, 255) "■" RESET);
+	gotoxy(62, 6);
+	printf(FG_COLOR(0, 255, 255) "■" RESET);
+	gotoxy(58, 7);
+	printf(FG_COLOR(0, 255, 255) "■■■■■" RESET);
+
+	gotoxy(72, 3);
+	printf(FG_COLOR(148, 0, 211) "■■■■" RESET);
+	gotoxy(71, 4);
+	printf(FG_COLOR(148, 0, 211) "■" RESET);
+	gotoxy(72, 5);
+	printf(FG_COLOR(148, 0, 211) "■■■■" RESET);
+	gotoxy(79, 6);
+	printf(FG_COLOR(148, 0, 211) "■" RESET);
+	gotoxy(72, 7);
+	printf(FG_COLOR(148, 0, 211) "■■■■" RESET);
+
 	printf("\n\n\n");
 }
 
@@ -612,6 +674,9 @@ void OptionMenu() // 옵션 메뉴
 	gotoxy(Width / 2 + 8, Height / 2 + 1);
 	printf("◀");
 
+	gotoxy(Width / 2 - 11, Height - 3);
+	printf(FG_COLOR(255, 0, 0) "메인메뉴로 가기 : Q키" RESET);
+
 	int return_n = 13;
 	while (1) { // 키보드 움직임
 		int key;
@@ -654,6 +719,12 @@ void OptionMenu() // 옵션 메뉴
 						break;
 					}
 				}
+			}
+			if (key == 81 || key == 113) {
+				FirstSetting();
+				stagenum = 1;
+				main();
+				break;
 			}
 		}
 	}
@@ -2271,41 +2342,7 @@ void CheckClear() {
 			} //키보드 입력이 들어올 때 까지 글씨가 깜빡거림
 		}
 
-		for (int i = 0; i < 22; i++) {
-			for (int j = 0; j < 12; j++) {
-				if (i == 0 || i == 21) space[i][j] = 1;
-				else if (j == 0 || j == 11) space[i][j] = 1;
-				else space[i][j] = 0;
-			}
-		}
-
-		for (int i = 0; i < 22; i++) {
-			for (int j = 0; j < 20; j++) {
-				if ((i == 3 || i == 8 || i == 14 || i == 19) && j >= 0 && j <= 6) UIspace[i][j] = 1;
-				else if ((i >= 4 && i <= 7 && (j == 0 || j == 6)) || (i >= 15 && i <= 18 && (j == 0 || j == 6))) UIspace[i][j] = 1;
-				else UIspace[i][j] = 0;
-			}
-		}
-
-		isStageClear = false;
-		Number_Line = 1, Number_Color = 1, Number_Speed = 1, Number_Block = 1;
-		blockCnt = 8;
-		CreateRandomForm();
-		x = 8, y = 0;
-		for (int i = 0; i < 7; i++) colorGauge[i] = 0;
-
-		isSpace = false;
-		isHold = false;
-		isHoldAlready = false;
-		isMusic = true;
-		isFirst = true;
-		isEnter = false;
-		isBlock = false;
-		isSlowItem = false;
-		for (int i = 0; i < 7; i++) {
-			isColor[i][0] = false;
-			isColor[i][1] = false;
-		}		
+		FirstSetting();
 
 		Width = 90;
 		Height = 30;
@@ -2317,5 +2354,43 @@ void CheckClear() {
 		}
 
 		stagenum++;
+	}
+}
+
+void FirstSetting() {
+	for (int i = 0; i < 22; i++) {
+		for (int j = 0; j < 12; j++) {
+			if (i == 0 || i == 21) space[i][j] = 1;
+			else if (j == 0 || j == 11) space[i][j] = 1;
+			else space[i][j] = 0;
+		}
+	}
+
+	for (int i = 0; i < 22; i++) {
+		for (int j = 0; j < 20; j++) {
+			if ((i == 3 || i == 8 || i == 14 || i == 19) && j >= 0 && j <= 6) UIspace[i][j] = 1;
+			else if ((i >= 4 && i <= 7 && (j == 0 || j == 6)) || (i >= 15 && i <= 18 && (j == 0 || j == 6))) UIspace[i][j] = 1;
+			else UIspace[i][j] = 0;
+		}
+	}
+
+	isStageClear = false;
+	Number_Line = 1, Number_Color = 1, Number_Speed = 1, Number_Block = 1;
+	blockCnt = 8;
+	CreateRandomForm();
+	x = 8, y = 0;
+	for (int i = 0; i < 7; i++) colorGauge[i] = 0;
+
+	isSpace = false;
+	isHold = false;
+	isHoldAlready = false;
+	isMusic = true;
+	isFirst = true;
+	isEnter = false;
+	isBlock = false;
+	isSlowItem = false;
+	for (int i = 0; i < 7; i++) {
+		isColor[i][0] = false;
+		isColor[i][1] = false;
 	}
 }
