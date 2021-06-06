@@ -46,6 +46,7 @@ bool isSlowItem = false;
 bool isColor[7][2] = { false };
 bool isStageClear = false;
 bool isBlock = false;
+bool isShowStory = false;
 
 int block[7][4][4][4] = {  // [7]은 블럭갯수. 랜덤으로 변환, 2차원 [4]는 증감할때마다 회전
 	{ // T모양 블럭
@@ -338,6 +339,7 @@ void DrawGauge(); // 게이즈 출력
 void CheckClear(); // 스테이지 클리어 체크
 void SelectBlock(); // 원하는 블럭 선택 아이템
 void FirstSetting(); // 초기 세팅
+void ShowStory(); // 스토리 보여주기
 
 int main() {
 	srand(time(NULL));
@@ -353,7 +355,7 @@ int main() {
 		switch (return_n)
 		{
 		case 0:
-			SelectTheme();
+			ShowStory();
 			break;
 		case 3:
 			MenuTwo();
@@ -514,6 +516,38 @@ int MainMenu()
 					return return_n; //화살표의 좌표값을 반환
 		}
 	}
+}
+
+void ShowStory() {
+	system("cls");
+	if (isShowStory == false) {
+		gotoxy(31, 5);
+		printf(FG_COLOR(255, 255, 0) "\" 요리왕이 되고 싶은 비룡 \"" RESET);
+		gotoxy(14, 9);
+		printf(FG_COLOR(255, 255, 0) "\" 비룡은 여러가지 요리의 조리법을 알아내기 위해 모험을 떠난다. \"" RESET);
+
+		gotoxy(20, 16);
+		printf("여러분들은 비룡이 요리왕이 될 수 있도록 도와주세요!");
+		gotoxy(14, 19);
+		printf("3가지 테마의 요리 조리법을 모두 습득하여 요리왕이 되길 바랍니다!");
+		isShowStory = true;
+
+		while (1)
+		{
+			gotoxy(Width / 2 - 15, Height - 3);
+			printf("계속하려면 스페이스바를 누르세요!");
+			Sleep(500);
+			if (kbhit()) {
+				key = getch();
+				if (key == 32) break;
+			}
+			gotoxy(Width / 2 - 15, Height - 3);
+			printf("                                   ");
+			Sleep(500);
+		} //키보드 입력이 들어올 때 까지 글씨가 깜빡거림
+	}	
+
+	SelectTheme();
 }
 
 void MenuTwo() // 조작법 메뉴
