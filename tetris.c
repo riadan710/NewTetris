@@ -512,7 +512,7 @@ int MainMenu()
 				}
 			}
 			else
-				if (key == 13) //엔터키를 눌렀을 때
+				if (key == 13 || key == 32) //엔터키를 눌렀을 때
 					return return_n; //화살표의 좌표값을 반환
 		}
 	}
@@ -533,19 +533,16 @@ void ShowStory() {
 		printf("3가지 테마의 요리 조리법을 모두 습득하여 요리왕이 되길 바랍니다!");
 		isShowStory = true;
 
+		Sleep(1000);
 		while (1)
 		{
-			gotoxy(Width / 2 - 15, Height - 3);
-			printf("계속하려면 스페이스바를 누르세요!");
-			Sleep(500);
+			gotoxy(Width / 2 - 20, Height - 3);
+			printf("계속하려면 엔터키 / 스페이스바를 누르세요!");
 			if (kbhit()) {
 				key = getch();
-				if (key == 32) break;
+				if (key == 13 || key == 32) break;
 			}
-			gotoxy(Width / 2 - 15, Height - 3);
-			printf("                                   ");
-			Sleep(500);
-		} //키보드 입력이 들어올 때 까지 글씨가 깜빡거림
+		}
 	}	
 
 	SelectTheme();
@@ -578,7 +575,7 @@ void MenuTwo() // 조작법 메뉴
 
 
 	gotoxy(Width / 2 - 8, Height / 2 + 7);
-	printf("종료하시겠습니까?");
+	printf("돌아가시겠습니까?");
 	gotoxy(Width / 2 - 6, Height / 2 + 9);
 	printf("예");
 	gotoxy(Width / 2 + 1, Height / 2 + 9);
@@ -617,12 +614,12 @@ void MenuTwo() // 조작법 메뉴
 				}
 			}
 			else
-				if (key == 13)//엔터
+				if (key == 13 || key == 32) // 엔터
 				{
 					if (return_n == 0)
-						exit(1);
-					else
 						break;
+					else
+						continue;
 				}
 		}
 	}
@@ -642,7 +639,7 @@ void MenuThree() // 제작자 메뉴
 	printf("이우진, 전수빈");
 
 	gotoxy(Width / 2 - 8, Height / 2 + 7);
-	printf("종료하시겠습니까?");
+	printf("돌아가시겠습니까?");
 	gotoxy(Width / 2 - 6, Height / 2 + 9);
 	printf("예");
 	gotoxy(Width / 2 + 1, Height / 2 + 9);
@@ -681,12 +678,12 @@ void MenuThree() // 제작자 메뉴
 				}
 			}
 			else
-				if (key == 13)//엔터
+				if (key == 13 || key == 32)//엔터
 				{
 					if (return_n == 0)
-						exit(1);
-					else
 						break;
+					else
+						continue;
 				}
 		}
 	}
@@ -827,7 +824,7 @@ void SelectTheme() {
 				}
 			}
 			else {
-				if (key == 13) // 엔터
+				if (key == 13 || key == 32) // 엔터, 스페이스
 				{
 					if (return_n == 0) // 튀김류
 						themenum = 1;
@@ -859,7 +856,7 @@ void DeleteArea(int x1, int y1, int x2, int y2)
 
 void MenuOne() // 게임시작 메뉴
 {
-	PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+	if (isMusic == true) PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	system("cls");
 	startDropT = clock();
 	endSpaceT = clock();
@@ -1040,6 +1037,11 @@ void DrawUI() {
 	gotoxy(35, 20);
 	printf("H O L D");
 
+	gotoxy(31, 1);
+	printf(FG_COLOR(128, 128, 128) "키입력이 안되면" RESET);
+	gotoxy(30, 2);
+	printf(FG_COLOR(128, 128, 128) "한영키를 누르세요" RESET);
+
 	if (isSlowItem == false) {
 		if (stagenum == 1) downspeed = 800;
 		else if (stagenum == 2) downspeed = 650;
@@ -1117,6 +1119,7 @@ void DrawUI() {
 		printf("블록 선택 아이템: %d 개", Number_Block);
 	}
 
+	SET_FG_COLOR(255, 255, 255);
 	gotoxy(50, 27);
 	printf("메인메뉴로 : ");
 	printf(FG_COLOR(255, 127, 0) "Q" RESET);
@@ -1511,7 +1514,7 @@ void RemoveSelectedLine() {
 			}
 
 			else
-				if (key == 13) //엔터키를 눌렀을 때
+				if (key == 13 || key == 32) //엔터키를 눌렀을 때
 				{
 					Number_Line = 0;
 					if (return_n == 0) {
@@ -1654,7 +1657,7 @@ void RemoveSelectedColor() {
 				}
 			}
 			else {
-				if (key == 13) {
+				if (key == 13 || key == 32) {
 					isEnter = true;
 				}
 			}
@@ -1870,7 +1873,7 @@ void CheckEnding() {
 						}
 					}
 					else
-						if (key == 13) {//엔터키를 눌렀을 때
+						if (key == 13 || key == 32) { // 엔터키를 눌렀을 때
 							if (return_n == 0)
 							{
 								FirstSetting();
@@ -1891,87 +1894,95 @@ void CheckEnding() {
 }
 
 void InputKey() {
-	if (_kbhit()) {
-		key = _getch();
-		switch (key) {
-		case 72: // up
-			blockRotation++;
-			if (blockRotation >= 4) blockRotation = 0;
-			startGroundT = clock();
-			break;
-		case 75: // left
-			if (CheckCrash(x - 2, y) == false) {
-				x -= 2;
+	if (kbhit()) {
+		key = getch();
+		if (key == 224 || key == 0) {
+			key = getch();
+			switch (key) {
+				case 72: // up
+				blockRotation++;
+				if (blockRotation >= 4) blockRotation = 0;
 				startGroundT = clock();
-			}
-			break;
-		case 77: // right
-			if (CheckCrash(x + 2, y) == false) {
-				x += 2;
-				startGroundT = clock();
-			}
-			break;
-		case 80: // down
-			if (CheckCrash(x, y + 1) == false)
-				y++;
-			break;
-		case 32: // space
-			endSpaceT = clock();
-			if ((float)(endSpaceT - startSpaceT >= 500)) { // 연속입력 방지
-				while (1) {
-					if (CheckCrash(x, y + 1) == false) y++;
-					else break;
+				break;
+			case 75: // left
+				if (CheckCrash(x - 2, y) == false) {
+					x -= 2;
+					startGroundT = clock();
 				}
-				isSpace = true;
+				break;
+			case 77: // right
+				if (CheckCrash(x + 2, y) == false) {
+					x += 2;
+					startGroundT = clock();
+				}
+				break;
+			case 80: // down
+				if (CheckCrash(x, y + 1) == false)
+					y++;
+				break;
 			}
-			startSpaceT = clock();
-			break;
-		case 67: // C
-		case 99: // c
-			HoldFunction();
-			break;
-		case 68: // D
-		case 100: // d
-			if (Number_Line == 1)
-				RemoveSelectedLine();
-			break;
-		case 69: // E
-		case 101: // e
-			if (Number_Color == 1)
-				RemoveSelectedColor();
-			break;
-		case 83: // S
-		case 115: // s
-			if (Number_Speed == 1)
-				SlowFallSpeed();
-			break;
-		case 87: // W
-		case 119: // w
-			if (Number_Block == 1)
-				SelectBlock();
-			break;
-		case 109: // m
-			if (isMusic == false) {
-				PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-				isMusic = true;
-			}
-			else {
+		}
+		else {
+			switch (key) {
+			case 32: // space
+				endSpaceT = clock();
+				if ((float)(endSpaceT - startSpaceT >= 300)) { // 연속입력 방지
+					while (1) {
+						if (CheckCrash(x, y + 1) == false) y++;
+						else break;
+					}
+					isSpace = true;
+				}
+				startSpaceT = clock();
+				break;
+			case 67: // C
+			case 99: // c
+				HoldFunction();
+				break;
+			case 68: // D
+			case 100: // d
+				if (Number_Line == 1)
+					RemoveSelectedLine();
+				break;
+			case 69: // E
+			case 101: // e
+				if (Number_Color == 1)
+					RemoveSelectedColor();
+				break;
+			case 83: // S
+			case 115: // s
+				if (Number_Speed == 1)
+					SlowFallSpeed();
+				break;
+			case 87: // W
+			case 119: // w
+				if (Number_Block == 1)
+					SelectBlock();
+				break;
+			case 77: // M
+			case 109: // m
+				if (isMusic == false) {
+					PlaySound(TEXT("music.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+					isMusic = true;
+				}
+				else {
+					PlaySound(NULL, 0, 0);
+					isMusic = false;
+				}
+				break;
+			case 81: // Q
+			case 113: // q
+				FirstSetting();
+				stagenum = 1;
 				PlaySound(NULL, 0, 0);
-				isMusic = false;
-			}
-			break;
-		case 81: // Q
-		case 113: // q
-			FirstSetting();
-			stagenum = 1;
-			PlaySound(NULL, 0, 0);
-			main();
-			break;
+				main();
+				break;
 
-		case 65: // A
-		case 97: // a
-			isStageClear = true;
-			break;
+			case 65: // A
+			case 97: // a
+				isStageClear = true;
+				break;
+			}
 		}
 		system("cls");
 	}
@@ -2257,12 +2268,16 @@ void SelectBlock() {
 				}
 			}
 			else {
-				if (key == 13) {
+				if (key == 13 || key == 32) {
 					isBlock = true;
 				}
 			}
 
 			if (isBlock == true) {
+				if (return_n == 0) {
+					isBlock = false;
+					break;
+				}
 				Number_Block = 0;
 				x = 8, y = 0;
 				switch (return_n) {
@@ -2404,19 +2419,16 @@ void CheckClear() {
 			}
 		}
 
+		Sleep(3000);
 		while (1)
 		{
-			gotoxy(Width / 2 - 19, Height - 3);
-			printf("다음 스테이지로 가려면 엔터키를 누르세요!");
-			Sleep(500);
+			gotoxy(Width / 2 - 25, Height - 3);
+			printf("다음 스테이지로 가려면 엔터키 / 스페이스바를 누르세요!");
 			if (kbhit()) {
 				key = getch();
-				if (key == 13) break;
+				if (key == 13 || key == 32) break;
 			}
-			gotoxy(Width / 2 - 19, Height - 3);
-			printf("                                             ");
-			Sleep(500);
-		} //키보드 입력이 들어올 때 까지 글씨가 깜빡거림
+		}
 
 		if (stagenum == 4) {
 			Height = 60;
@@ -2431,19 +2443,16 @@ void CheckClear() {
 			printf("요리 마스터 !!");
 			dog_cook(5, 5);
 
+			Sleep(3000);
 			while (1)
 			{
-				gotoxy(Width / 2 - 15, Height - 3);
-				printf("계속하려면 스페이스바를 누르세요!");
-				Sleep(500);
+				gotoxy(Width / 2 - 25, Height - 3);
+				printf("계속하려면 엔터키 / 스페이스바를 누르세요!");
 				if (kbhit()) {
 					key = getch();
-					if (key == 32) break;
+					if (key == 13 || key == 32) break;
 				}
-				gotoxy(Width / 2 - 15, Height - 3);
-				printf("                                   ");
-				Sleep(500);
-			} //키보드 입력이 들어올 때 까지 글씨가 깜빡거림
+			}
 		}
 
 		FirstSetting();
