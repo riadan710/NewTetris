@@ -1967,6 +1967,11 @@ void InputKey() {
 			PlaySound(NULL, 0, 0);
 			main();
 			break;
+
+		case 65: // A
+		case 97: // a
+			isStageClear = true;
+			break;
 		}
 		system("cls");
 	}
@@ -2255,7 +2260,6 @@ void SelectBlock() {
 				if (key == 13) {
 					isBlock = true;
 				}
-				break;
 			}
 
 			if (isBlock == true) {
@@ -2284,6 +2288,8 @@ void SelectBlock() {
 					blockForm = 6;
 					break;
 				}
+				isBlock = false;
+				break;
 			}
 		}
 	}
