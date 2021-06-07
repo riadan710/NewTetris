@@ -1913,10 +1913,15 @@ void InputKey() {
 		key = getch();
 		if (key == 224 || key == 0) {
 			key = getch();
+			int tmpt;
 			switch (key) {
-				case 72: // up
+			case 72: // up
+				tmpt = blockRotation;
 				blockRotation++;
 				if (blockRotation >= 4) blockRotation = 0;
+				if (CheckCrash(x, y) == true) {
+					blockRotation = tmpt;
+				}
 				startGroundT = clock();
 				break;
 			case 75: // left
@@ -1991,11 +1996,6 @@ void InputKey() {
 				stagenum = 1;
 				PlaySound(NULL, 0, 0);
 				main();
-				break;
-
-			case 65: // A
-			case 97: // a
-				isStageClear = true;
 				break;
 			}
 		}
