@@ -885,6 +885,21 @@ void MenuOne() // 게임시작 메뉴
 }
 
 void CreateRandomForm() { // 랜덤 수 생성 (7bag 시스템 구현)
+	int check[7] = { 0 };
+	int p = 8;
+	for (int i = 0; i < 7; i++) {
+		if (blockNum[i] >= 7) {
+			p = i;
+		}
+		else {
+			check[blockNum[i]]++;
+		}
+	}
+	for (int i = 0; i < 7; i++) {
+		if (check[i] == 0 && p != 8)
+			blockNum[p] = i;
+	}
+
 	isHoldAlready = false;
 	if (blockCnt < 7) {
 		blockForm = blockNum[blockCnt++];
