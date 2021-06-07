@@ -1191,6 +1191,9 @@ void DrawGauge() {
 			isColor[3][0] = true;
 			isColor[6][0] = true;
 			isColor[2][0] = true;
+			if (isColor[5][1] == true && isColor[3][1] == true && isColor[6][1] == true && isColor[2][1] == true) {
+				isStageClear = true;
+			}
 		}
 		else if (stagenum == 3) {
 			isColor[5][0] = true;
@@ -1198,6 +1201,9 @@ void DrawGauge() {
 			isColor[1][0] = true;
 			isColor[6][0] = true;
 			isColor[2][0] = true;
+			if (isColor[5][1] == true && isColor[0][1] == true && isColor[1][1] == true && isColor[6][1] == true && isColor[2][1] == true) {
+				isStageClear = true;
+			}
 		}
 		else {
 			isColor[5][0] = true;
@@ -1206,6 +1212,9 @@ void DrawGauge() {
 			isColor[6][0] = true;
 			isColor[2][0] = true;
 			isColor[3][0] = true;
+			if (isColor[5][1] == true && isColor[1][1] == true && isColor[0][1] == true && isColor[6][1] == true && isColor[2][1] == true && isColor[3][1] == true) {
+				isStageClear = true;
+			}
 		}
 	}
 	else if (themenum == 2) {
@@ -1213,12 +1222,18 @@ void DrawGauge() {
 			isColor[3][0] = true;
 			isColor[1][0] = true;
 			isColor[5][0] = true;
+			if (isColor[5][1] == true && isColor[1][1] == true && isColor[3][1] == true) {
+				isStageClear = true;
+			}
 		}
 		else if (stagenum == 2) {
 			isColor[5][0] = true;
 			isColor[3][0] = true;
 			isColor[6][0] = true;
 			isColor[2][0] = true;
+			if (isColor[5][1] == true && isColor[3][1] == true && isColor[0][1] == true && isColor[6][1] == true && isColor[2][1] == true) {
+				isStageClear = true;
+			}
 		}
 		else if (stagenum == 3) {
 			isColor[3][0] = true;
@@ -1226,6 +1241,9 @@ void DrawGauge() {
 			isColor[5][0] = true;
 			isColor[2][0] = true;
 			isColor[4][0] = true;
+			if (isColor[3][1] == true && isColor[0][1] == true && isColor[5][1] == true && isColor[2][1] == true && isColor[4][1] == true) {
+				isStageClear = true;
+			}
 		}
 		else {
 			isColor[5][0] = true;
@@ -1234,6 +1252,9 @@ void DrawGauge() {
 			isColor[6][0] = true;
 			isColor[4][0] = true;
 			isColor[2][0] = true;
+			if (isColor[5][1] == true && isColor[1][1] == true && isColor[0][1] == true && isColor[6][1] == true && isColor[2][1] == true && isColor[4][1] == true) {
+				isStageClear = true;
+			}
 		}
 	}
 	else {
@@ -1241,12 +1262,18 @@ void DrawGauge() {
 			isColor[3][0] = true;
 			isColor[4][0] = true;
 			isColor[2][0] = true;
+			if (isColor[3][1] == true && isColor[4][1] == true && isColor[2][1] == true) {
+				isStageClear = true;
+			}
 		}
 		else if (stagenum == 2) {
 			isColor[5][0] = true;
 			isColor[3][0] = true;
 			isColor[6][0] = true;
 			isColor[4][0] = true;
+			if (isColor[5][1] == true && isColor[3][1] == true && isColor[6][1] == true && isColor[4][1] == true) {
+				isStageClear = true;
+			}
 		}
 		else if (stagenum == 3) {
 			isColor[5][0] = true;
@@ -1254,6 +1281,9 @@ void DrawGauge() {
 			isColor[2][0] = true;
 			isColor[1][0] = true;
 			isColor[3][0] = true;
+			if (isColor[5][1] == true && isColor[6][1] == true && isColor[2][1] == true && isColor[1][1] == true && isColor[3][1] == true) {
+				isStageClear = true;
+			}
 		}
 		else {
 			isColor[6][0] = true;
@@ -1262,6 +1292,9 @@ void DrawGauge() {
 			isColor[5][0] = true;
 			isColor[1][0] = true;
 			isColor[4][0] = true;
+			if (isColor[6][1] == true && isColor[3][1] == true && isColor[2][1] == true && isColor[5][1] == true && isColor[1][1] == true && isColor[4][1] == true) {
+				isStageClear = true;
+			}
 		}
 	}
 
